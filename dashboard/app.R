@@ -3,7 +3,7 @@ library(shiny)
 library(shinydashboard)
 
 ui <- dashboardPage(
-  dashboardHeader(title = "Expedia Analysis"),
+  dashboardHeader(title = "Employee Analysis"),
   ## Sidebar content
   dashboardSidebar(
     sidebarMenu(
