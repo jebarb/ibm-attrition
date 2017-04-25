@@ -16,7 +16,7 @@ ui <- dashboardPage(
     tabItems(
       tabItem(tabName = "proposal",
               h2("IBM Employee Data Analysis"),
-              p("We used the IBM HR Analytics Employee Attrition & Performance data from Kagle to explore the correlation between features and to find the common pattern in the dataset in order to uncover the factors that lead to employee attrition"),
+              p("We used the IBM HR Analytics Employee Attrition & Performance data from Kagle to explore the correlation between features and to find the common pattern in the dataset in order to uncover the factors that lead to employee attrition. By doing that, our goal is to build a predictive model that can predict employee attrition with high accuracy"),
               h3("Questions we would like to answer"),
               tags$ul(
                 tags$li("Is there a gender gap between workers of different fields?"), 
@@ -47,7 +47,13 @@ ui <- dashboardPage(
                 tags$li("There is no strong correlation between work life balance and years in company or years in position. Also monthly income has trivial influence on work life balance"),
                 tags$li("There is positive linear relationship between years at company and years since last promotion, with a significant adjusted R^2 0.382")
               ),
-              h3("Next steps")
+              h3("Next steps"),
+              tags$ul(
+                tags$li("Continue running on feature selection to delete irrelevant ones"),
+                tags$li("Continue on model selection and compare the accuracy between different models"),
+                tags$li("Perform logistic regression on employee attrition"),
+                tags$li("Once we finish all analysis, we will put everything in shiny app to form a complete project")
+              )
       ),
       tabItem(tabName = "interactive",
               h2("Interactive content"))
