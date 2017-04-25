@@ -1,6 +1,7 @@
 ## app.R ##
 library(shiny)
 library(shinydashboard)
+source("setup.R")
 
 ui <- dashboardPage(
   dashboardHeader(title = "Employee Analysis"),
@@ -33,7 +34,16 @@ ui <- dashboardPage(
               )
       ),
       tabItem(tabName = "exploratory",
-              h2("Exploratory analsyis tab content")
+              h2("Exploratory Analysis"),
+              h4("Graph of average monthly income across all roles faceted by gender"),
+              plotOutput("plot1", width = 600, height = 500),
+              h4("Average monthly income based on Marital status"),
+              plotOutput("plot3", width = 600, height = 500),
+              br(),
+              plotOutput("plot2", width = 600, height = 500)
+              #h4(""),
+              #plotOutput("plot4")
+              #png("plot4.png")
       ),
       tabItem(tabName = "exploratory_summary",
               h2("Exploratory Analysis Results"),
@@ -62,13 +72,28 @@ ui <- dashboardPage(
 )
 
 server <- function(input, output) {
-  set.seed(122)
-  histdata <- rnorm(500)
   
-  output$plot1 <- renderPlot({
-    data <- histdata[seq_len(input$slider)]
-    hist(data)
-  })
+  output$plot1 <- renderPlot(ggplot(gender_influence_monthlyincome, aes(x=Gender,y=average_monthly_income, color=Gender))+
+                               geom_bar(stat = "identity",width=0.5,position=position_dodge())+
+                               geom_text(aes(label=round_income), vjust=1.6, color="white",
+                                         position = position_dodge(0.9), size=3.5)+
+                               facet_wrap(~JobRole)+
+                               theme_minimal()+
+                               scale_fill_manual(values=c("red", "blue"))+
+                               ggtitle("Monthly incomes across Job Roles")+
+                               scale_y_continuous(name="Average Monthly Income"))
+  output$plot2 <- renderPlot(ggplot(employee, aes(x = Gender, color = Gender)) +
+                               geom_bar()+ 
+                               facet_wrap(~JobRole)+
+                               ggtitle("Job distribution among gender"))
+  output$plot3 <- renderPlot(ggplot(testing, aes(x=testing$MaritalStatus,y=testing$mean))+
+                               geom_bar(stat = "identity",width=0.5, position=position_dodge())+
+                               geom_text(aes(label=testing$mean), vjust=1.6, color="white",
+                                         position = position_dodge(0.9), size=3.5)+
+                               labs(x="Marital Status",y="Average Monthly Income")+
+                               ggtitle("Put a ring on it"))
+  output$plot4 <- renderPlot(boxplot(MonthlyIncome~WorkLifeBalance,data = employee,xlab="PerformanceRating", ylab="MonthlyIncome") + 
+                               ggtitle("performance vs monthly income"))
 }
 
 shinyApp(ui, server)
