@@ -64,7 +64,7 @@ plot5 <- renderPlot(ggplot(JobSat, aes(x=reorder(Jobsatty,-JobSat$mean),y=JobSat
 
 # plot6
 lin_reg <- lm(WorkLifeBalance~ YearsSinceLastPromotion, employee)
-plot6 <- renderPlot(summary(lin_reg))
+plot6 <- renderPrint(summary(lin_reg))
 
 # plot7
 plot7 <- renderPlot(boxplot(MonthlyIncome~WorkLifeBalance,data = employee,xlab="PerformanceRating", ylab="MonthlyIncome"))
@@ -84,7 +84,7 @@ flattenCorrMatrix <- function(cormat, pmat) {
   )
 }
 
-plot8 <- renderPlot(flattenCorrMatrix(res2$r, res2$P))
+plot8 <- renderTable(flattenCorrMatrix(res2$r, res2$P))
 
 # plot9
 plot9 <- renderPlot(chart.Correlation(numeric, histogram=TRUE, pch=19))

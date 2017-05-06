@@ -48,18 +48,19 @@ ui <- dashboardPage(
               h4("Average monthly income across different levels of Job Satisfaction."),
               plotOutput("plot5", width = 600, height = 500),
               h4("There is no significant linear relationship between Work life balance and years since last promotion"),
-              #plotOutput("plot6", width = 600, height = 500),
+              verbatimTextOutput("plot6", width = 600),
+              h4("add info on plot 7"),
               plotOutput("plot7", width = 600, height = 500),
-              h4("The figure below shows the correlation between 5 features and the significance level."),
-              #plotOutput("plot8", width = 600, height = 500),
-              #p('The figure below is also the visualization of correlations between 5 features. 
-              #  The distribution of each variable is shown on the diagonal.
-              #  On the bottom of the diagonal : the bivariate scatter plots with a fitted line are isplayed
-              #  On the top of the diagonal : the value of the correlation plus the significance level as stars. 
-              #  Each significance level is associated to a symbol : p-values(0, 0.001, 0.01, 0.05, 0.1, 1) <=> symbols(“***”, “**”, “*”, “.”, " “)'),
+              p('The figure below is also the visualization of correlations between 5 features. 
+                The distribution of each variable is shown on the diagonal.
+                On the bottom of the diagonal : the bivariate scatter plots with a fitted line are isplayed
+                On the top of the diagonal : the value of the correlation plus the significance level as stars. 
+                Each significance level is associated to a symbol : p-values(0, 0.001, 0.01, 0.05, 0.1, 1) <=> symbols(“***”, “**”, “*”, “.”, " “)'),
+              tableOutput("plot8"),
               plotOutput("plot9", width = 600, height = 500),
               h4("The figure below shows female has higher avarage salary than males in IBM."),
               plotOutput("plot10", width = 600, height = 500),
+              h4("add info on plot 11"),
               plotOutput("plot11", width = 600, height = 500),
               h4("The figure below illastrates the job distribution between male and female."),
               plotOutput("plot12", width = 600, height = 500)
