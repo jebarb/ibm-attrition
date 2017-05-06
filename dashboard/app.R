@@ -48,7 +48,7 @@ ui <- dashboardPage(
               h4("Average monthly income across different levels of Job Satisfaction."),
               plotOutput("plot5", width = 600, height = 500),
               h4("There is no significant linear relationship between Work life balance and years since last promotion"),
-              verbatimTextOutput("plot6", width = 600),
+              verbatimTextOutput("plot6"),
               h4("add info on plot 7"),
               plotOutput("plot7", width = 600, height = 500),
               p('The figure below is also the visualization of correlations between 5 features. 
@@ -92,18 +92,18 @@ ui <- dashboardPage(
 )
 
 server <- function(input, output) {
-  output$plot1 <- plot1
-  output$plot2 <- plot2
-  output$plot3 <- plot3
-  output$plot4 <- plot4
-  output$plot5 <- plot5
-  output$plot6 <- plot6
-  output$plot7 <- plot7
-  output$plot8 <- plot8
-  output$plot9 <- plot9
-  output$plot10 <- plot10
-  output$plot11 <- plot11
-  output$plot12 <- plot12
+  output$plot1 <- renderPlot(plot1)
+  output$plot2 <- renderPlot(plot2)
+  output$plot3 <- renderPlot(plot3)
+  output$plot4 <- renderPlot(plot4)
+  output$plot5 <- renderPlot(plot5)
+  output$plot6 <- renderPrint(plot6)
+  output$plot7 <- renderPlot(plot7)
+  output$plot8 <- renderTable(plot8)
+  output$plot9 <- renderPlot(plot9)
+  output$plot10 <- renderPlot(plot10)
+  output$plot11 <- renderPlot(plot11)
+  output$plot12 <- renderPlot(plot12)
 }
 
 shinyApp(ui, server)
