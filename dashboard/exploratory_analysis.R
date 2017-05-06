@@ -2,6 +2,7 @@ library(tidyverse)
 library(stringr)
 library(PerformanceAnalytics)
 library(Hmisc)
+library(corrplot)
 
 employee <- read_csv("WA_Fn-UseC_-HR-Employee-Attrition.csv")
 quit <- filter(employee, Attrition=="Yes")
@@ -97,3 +98,28 @@ genderJobIncome <- employee  %>% group_by(Gender, JobRole) %>%
   summarise(meanSalarybyJob = mean(MonthlyIncome))
 exploratory_plot12 <- ggplot(genderJobIncome, aes(x = JobRole,y = meanSalarybyJob, color = Gender)) +
   geom_point() +ggtitle("Mean monthly income among diffrent jobs across gender ")
+
+# plot13
+employee$Attrition[employee$Attrition=="Yes"] <- 1
+employee$Attrition[employee$Attrition=="No"] <- 0
+integer_data <-employee[,c(1,2,4,6,7,10,11,13,14,15,17,19,20,21,24,25,26,28:35)]
+integer_data$Attrition <-as.numeric(integer_data$Attrition)
+correlation_data <- cor(integer_data)
+# plot14
+quit <- filter(employee, Attrition==1)
+exploratory_plot14 <-ggplot(data=quit)+
+  geom_point(aes(y=quit$MonthlyIncome, x=quit$BusinessTravel,color=JobRole))+
+  labs(y="Monthly Income", x="Travels")+
+  ggtitle("Attritions trend Income VS Travel")
+
+# plot15
+exploratory_plot15 <-ggplot(data=employee)+
+  geom_point(aes(y=employee$MonthlyIncome, x=employee$TotalWorkingYears,color=JobRole))+
+  labs(y="Monthly Income", x="Working Years")+
+  ggtitle("Observing trend of Income VS Working Years")
+
+# plot16
+exploratory_plot16 <- ggplot(data=employee)+
+  geom_point(aes(y=employee$PercentSalaryHike, x=employee$PerformanceRating, color=Attrition))+
+  labs(y="Percentage Hike", x="Performance Rating")+
+  ggtitle("Attritions trend Percentage Hike VS Performance Rating")
