@@ -66,9 +66,6 @@ exploratory_plot5 <- ggplot(JobSat, aes(x=reorder(Jobsatty,-JobSat$mean),y=JobSa
 lin_reg <- lm(WorkLifeBalance~ YearsSinceLastPromotion, employee)
 exploratory_plot6 <- summary(lin_reg)
 
-# plot7
-exploratory_plot7 <- boxplot(MonthlyIncome~WorkLifeBalance,data = employee,xlab="PerformanceRating", ylab="MonthlyIncome")
-
 # plot8
 numeric <- employee[, c(1,4,6,7,10)]
 #see correlation between features 
@@ -85,9 +82,6 @@ flattenCorrMatrix <- function(cormat, pmat) {
 }
 
 exploratory_plot8 <- flattenCorrMatrix(res2$r, res2$P)
-
-# plot9
-exploratory_plot9 <- chart.Correlation(numeric, histogram=TRUE, pch=19)
 
 # plot10
 genderIncome <- employee %>% group_by(Gender) %>%
