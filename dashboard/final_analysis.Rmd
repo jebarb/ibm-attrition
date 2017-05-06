@@ -1,5 +1,5 @@
 ---
-title: "Final Analysis"
+title: "final analysis"
 author: "Ria Pan"
 date: "May 6, 2017"
 output: md_document
@@ -14,10 +14,12 @@ library(DMwR)
 library(randomForest)
 library(e1071)
 ```
+#Final Analysis
 After our exploratory anlaysis, we got a sense of how correlated one feature is to the other and created some visualisations. Based on that result, we are going to build a predictive model on emplyee's attrition. To start off, we will first construct some feature engineering. 
 
 ```{r}
 data <- read.csv('WA_Fn-UseC_-HR-Employee-Attrition.csv')
+
 ```
 
 ## Feature engineering & Categorical Encoding
@@ -33,10 +35,10 @@ Having identified which features contain categorical data in our dataset, we enc
 ```{r}
 dummy <- model.matrix(Attrition ~ ., data)
 new <- data.frame(dummy) # change back to a datafram 
-new <- new[,-1] # get rid first useless column
+new <- new[,-1] # get rid first useless columne
 Attrition <- data$Attrition
 dataDummy <- cbind(Attrition,new) #add Attrition back 
-head(dataDummy[,3:4]) # these are the dummy variables
+head(dataDummy[,3:4])
 ```
 
 
@@ -50,10 +52,10 @@ table(dataDummy$Attrition)
 In this case we have to keep in mind that there is quite a big imbalance in our target variable. And with imbalanced data sets, an algorithm doesn’t get the necessary information about the minority class to make an accurate prediction. In order to solve imbalanced data, we have considered many techniques such as repeated oversampling and undersampling. And we decided to use an oversampling technique known as SMOTE to treat this imbalance, which will be performed in next section. 
 
 
-#Implementing Models
+##Implementing Models
 Having performed some exploratory data analysis and simple feature engineering as well as having ensured that all categorical values are encoded, we are now ready to proceed onto building our models.
 
-###Splitting Data into Train and Test sets
+#Splitting Data into Train and Test sets
 Before we start training a model, we partitioned our dataset into a training set and a test set with proportion 8:2.
 ```{r}
 #split data into train and test 
@@ -63,7 +65,7 @@ test <- dataDummy[-splitIndex,]
 train <- dataDummy[splitIndex,]
 ```
 
-###SMOTE to oversample due to the skewness in target
+#SMOTE to oversample due to the skewness in target
 Since we have already noted the severe imbalance in the values within the target variable, we used SMOTE function to created some arbirary data in minor class to make the whole categorical distribution in target variable balanced. 
 The SMOTE function oversamples your rare event by using bootstrapping and k-nearest neighbor to synthetically create additional observations of that event. 
 ```{r}
@@ -75,3 +77,98 @@ prop.table(table(trainBalance$Attrition))
 We create some data in train set and now the proportion of "NO" "Yes" in target variable changed from 0.84:0.16 to 0.51:0.49. We are ready to build model based on this balanced data now. 
 
 
+
+##Random Forest Classifier 
+Since all interested in decidsion trees. We'll build an Random Forest Classifier to predict employees' attrition without lossing any variables. From Wikipedia, Random forests are an ensemble learning method for classification, regression and other tasks, that operate by constructing a multitude of decision trees at training time and outputting the class that is the mode of the classes (classification) or mean prediction (regression) of the individual trees. We will first train such a model by using default tuning parametsrs from caret package. 
+
+
+###Train model with default setting 
+```{r}
+library(caret)
+set.seed(1234) #set seed to reproducible 
+ctrl <- trainControl(method = "cv", number = 5)
+rf_model <- train(Attrition~., data = trainBalance, method = "rf", trControl =ctrl)
+print(rf_model)
+plot(rf_model)
+``` 
+We chose the optimal model base on highest accuray, this model has mtry(Number of variables randomly sampled as candidates at each split) euqals to 2. 
+
+Having fitted our forest of trees with our parameters to the training set against our target variable, we now have a learning model "rf_model" which we can make predictions out of. Our next step is to make predictions by using this model. 
+```{r}
+predictors <- names(trainBalance)[names(trainBalance) != 'Attrition']
+pred_rf <- predict(rf_model$finalModel, test[,predictors],type = "prob")
+
+#use AUC to measure the prediction 
+auc <- roc(test$Attrition, pred_rf[,1])
+print(auc)
+plot(auc, ylim=c(0,1), print.thres=TRUE, main=paste('AUC:',round(auc$auc[[1]],2)))
+abline(h=1,col='blue',lwd=2)
+abline(h=0,col='red',lwd=2)
+
+```
+Accuracy of the model: 
+We use AUC(area under the curve) to measure the prediction results. As observed, our Random Forest returns an AUC of 0.8435 for its predictions. On first glance this might seem to be a very good performing model. From the AUC graph we can also find that the line quickly goes to 0.6, which means 60% class is easy to predict. Then the growth rate turned slow and hardly reached 1, meaning the last 10% class is hard to predict. 
+
+###Tuning parameters
+To further explore more, we tryied to tune the parameters in random forest model to see if we can find a better model. We focused on the below two parameters since they are most likely to have the biggest effect on your final accuracy.
+mtry: Number of variables randomly sampled as candidates at each split.
+ntree: Number of trees to grow.
+Unfortunately, only mtry parameter is available in caret package for tuning. Normally the larger ntree parameter the better the model, but when the number is big enough it's effect decrease. We noticed that in caret packge the ntree parameter is 500. We guess that's a farily high number to make the model accurate.
+In order to tune the mtry parameter, we found that there are two ways to tune the mtry parameter: 
+- Random Search: try random values within a range.
+- Grid Search: define a grid of algorithm parameters to try.
+We performed grid search by setting mtry =c(1:23). The result based on training accuracy gives us the optimal model when mtry =3. 
+
+```{r eval = FALSE}
+#grid search
+control <- trainControl(method="repeatedcv", number=10, repeats=3, search="grid")
+set.seed(1234)
+#since the ideal mtry is between sqrtq to 2/q.
+tunegrid <- expand.grid(.mtry=c(1:23))
+#tunegrid <- expand.grid(.mtry=8)
+rf_gridsearch <- train(Attrition~., data=trainBalance, method="rf", metric="Accuracy", tuneGrid=tunegrid, trControl=control)
+print(rf_gridsearch)
+plot(rf_gridsearch)
+```
+From the graph, we can see mtry =  3 has the optimum model using the largest value.
+
+```{r}
+control <- trainControl(method="repeatedcv", number=10, repeats=3)
+set.seed(1234)
+tunegrid <- expand.grid(.mtry= 3)
+rf_optimal <- train(Attrition~., data=trainBalance, method="rf", metric="Accuracy", tuneGrid=tunegrid, trControl=control)
+rf_optimal
+
+predictors <- names(trainBalance)[names(trainBalance) != 'Attrition']
+predictors
+pred_rf_gridsearch <- predict(rf_optimal$finalModel,test[,predictors],type = "prob")
+auc <- roc(test$Attrition, pred_rf_gridsearch[,1])
+print(auc)
+plot(auc, ylim=c(0,1), print.thres=TRUE, main=paste('AUC:',round(auc$auc[[1]],2)))
+abline(h=1,col='blue',lwd=2)
+abline(h=0,col='red',lwd=2)
+```
+After tuning parameter mtry we updated our model from using mtry =2 to mtry =3, which gives us a better AUC from original 0.8435 to 0.8437. There is no huge difference between these two models. 
+
+
+
+
+###Feature selection 
+```{r, eval = FALSE}
+#since the best mtry = 3
+importance_grid <- varImp(rf_gridsearch,scale = FALSE)
+print(importance_grid)
+plot(importance_grid)
+
+```
+We're suprised that marital status are not in the first 20 importance. It may because marital status has high correlation with other features(such as Age). We can also reflect back to the correlation analysis we made in Data Exploratory Analysis 
+
+###Building model based on selected data 
+```{r}
+slData <- data[, c("OverTime", "StockOptionLevel","TotalWorkingYears",
+"MonthlyIncome","JobInvolvement","Age","EnvironmentSatisfaction", "JobSatisfaction",
+"YearsWithCurrManager","YearsAtCompany","JobLevel","YearsInCurrentRole",
+"DailyRate","EmployeeNumber","TrainingTimesLastYear","DistanceFromHome","Education",
+"NumCompaniesWorked","HourlyRate","WorkLifeBalance")]
+
+```
