@@ -3,7 +3,7 @@ library(shiny)
 library(shinydashboard)
 
 source("exploratory_analysis.R")
-#source("final_analysis.R")
+source("final_analysis.R")
 
 ui <- dashboardPage(
   dashboardHeader(title = "Employee Analysis"),
@@ -38,32 +38,33 @@ ui <- dashboardPage(
       tabItem(tabName = "exploratory",
               h2("Exploratory Analysis"),
               h4("Graph of average monthly income across all roles faceted by gender"),
-              plotOutput("plot1", width = 600, height = 500),
+              plotOutput("exploratory_plot1", width = 600, height = 500),
               h4("Graph of percent of employee lost across job roles"),
-              plotOutput("plot2", width = 600, height = 500),
+              plotOutput("exploratory_plot2", width = 600, height = 500),
               h4("Average monthly income based on Marital status"),
-              plotOutput("plot3", width = 600, height = 500),
+              plotOutput("exploratory_plot3", width = 600, height = 500),
               h4("Average monthly income across different levels of Relationship satisfaction."),
-              plotOutput("plot4", width = 600, height = 500),
+              plotOutput("exploratory_plot4", width = 600, height = 500),
               h4("Average monthly income across different levels of Job Satisfaction."),
-              plotOutput("plot5", width = 600, height = 500),
+              plotOutput("exploratory_plot5", width = 600, height = 500),
               h4("There is no significant linear relationship between Work life balance and years since last promotion"),
-              verbatimTextOutput("plot6"),
+              verbatimTextOutput("exploratory_plot6"),
               h4("add info on plot 7"),
-              plotOutput("plot7", width = 600, height = 500),
+              plotOutput("exploratory_plot7", width = 600, height = 500),
               p('The figure below is also the visualization of correlations between 5 features. 
                 The distribution of each variable is shown on the diagonal.
                 On the bottom of the diagonal : the bivariate scatter plots with a fitted line are isplayed
                 On the top of the diagonal : the value of the correlation plus the significance level as stars. 
                 Each significance level is associated to a symbol : p-values(0, 0.001, 0.01, 0.05, 0.1, 1) <=> symbols(“***”, “**”, “*”, “.”, " “)'),
-              tableOutput("plot8"),
-              plotOutput("plot9", width = 600, height = 500),
+              tableOutput("exploratory_plot8"),
+              h4("add info on plot 9"),
+              plotOutput("exploratory_plot9", width = 600, height = 500),
               h4("The figure below shows female has higher avarage salary than males in IBM."),
-              plotOutput("plot10", width = 600, height = 500),
+              plotOutput("exploratory_plot10", width = 600, height = 500),
               h4("add info on plot 11"),
-              plotOutput("plot11", width = 600, height = 500),
+              plotOutput("exploratory_plot11", width = 600, height = 500),
               h4("The figure below illastrates the job distribution between male and female."),
-              plotOutput("plot12", width = 600, height = 500)
+              plotOutput("exploratory_plot12", width = 600, height = 500)
       ),
       tabItem(tabName = "exploratory_summary",
               h2("Exploratory Analysis Results"),
@@ -92,18 +93,18 @@ ui <- dashboardPage(
 )
 
 server <- function(input, output) {
-  output$plot1 <- renderPlot(plot1)
-  output$plot2 <- renderPlot(plot2)
-  output$plot3 <- renderPlot(plot3)
-  output$plot4 <- renderPlot(plot4)
-  output$plot5 <- renderPlot(plot5)
-  output$plot6 <- renderPrint(plot6)
-  output$plot7 <- renderPlot(plot7)
-  output$plot8 <- renderTable(plot8)
-  output$plot9 <- renderPlot(plot9)
-  output$plot10 <- renderPlot(plot10)
-  output$plot11 <- renderPlot(plot11)
-  output$plot12 <- renderPlot(plot12)
+  output$exploratory_plot1 <- renderPlot(exploratory_plot1)
+  output$exploratory_plot2 <- renderPlot(exploratory_plot2)
+  output$exploratory_plot3 <- renderPlot(exploratory_plot3)
+  output$exploratory_plot4 <- renderPlot(exploratory_plot4)
+  output$exploratory_plot5 <- renderPlot(exploratory_plot5)
+  output$exploratory_plot6 <- renderPrint(exploratory_plot6)
+  output$exploratory_plot7 <- renderPlot(exploratory_plot7)
+  output$exploratory_plot8 <- renderTable(exploratory_plot8)
+  output$exploratory_plot9 <- renderPlot(exploratory_plot9)
+  output$exploratory_plot10 <- renderPlot(exploratory_plot10)
+  output$exploratory_plot11 <- renderPlot(exploratory_plot11)
+  output$exploratory_plot12 <- renderPlot(exploratory_plot12)
 }
 
 shinyApp(ui, server)
