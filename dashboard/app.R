@@ -76,30 +76,64 @@ ui <- dashboardPage(
       ),
       # Interactive tab content
       tabItem(tabName = "interactive",
-              selectInput("OverTimeYes", "Overtime", c("Yes" = 0, "No" = 1)), # boolean
-              selectInput("StockOptionLevel", "StockOptionLevel", c("0" = 0, "1" = 1, "2" = 2, "3" = 3)), # 0-3
-              selectInput("EnvironmentSatisfaction", "EnvironmentSatisfaction", c("1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5)), # 1-4
-              selectInput("JobSatisfaction", "JobSatisfaction", c("1" = 1, "2" = 2, "3" = 3, "4" = 4)), # 1-4
-              selectInput("JobLevel", "JobLevel", c("1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5)), # 1-5              
-              selectInput("Education", "Education", c("1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5)), # 1-5              
-              selectInput("WorkLifeBalance", "WorkLifeBalance", c("1" = 1, "2" = 2, "3" = 3, "4" = 4)), # 1-4         
-              selectInput("MaritalStatus", "Marital Status ", c("Single" = "Single", "Married" = "Married", "Divorced" = "Divorced")), # boolean  
-              selectInput("JobInvolvement", "JobInvolvement", c("1" = 1, "2" = 2, "3" = 3, "4" = 4)), # 1-4          
-              numericInput("MonthlyIncome", "MonthlyIncome", 0),
-              numericInput("TotalWorkingYears", "TotalWorkingYears", c("1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5)), # 1-4  
-              numericInput("Age", "Age", 0),                    
-              numericInput("YearsWithCurrManager", "YearsWithCurrManager", 0),   
-              numericInput("YearsAtCompany", "YearsAtCompany", 0),          
-              numericInput("YearsInCurrentRole", "YearsInCurrentRole", 0),     
-              numericInput("DailyRate", "DailyRate", 0),               
-              numericInput("EmployeeNumber", "EmployeeNumber", 0),          
-              numericInput("TrainingTimesLastYear", "TrainingTimesLastYear", 0),   
-              numericInput("DistanceFromHome", "DistanceFromHome", 0),        
-              numericInput("NumCompaniesWorked", "NumCompaniesWorked", 0),     
-              numericInput("HourlyRate", "Hourly Rate", 0),
+              
               h2("Probability of Attrition"),
               verbatimTextOutput("view"),
-              tableOutput("df")
+              
+              # display 3 inputs side by side
+              bootstrapPage(
+                div(style="display:inline-block", selectInput("OverTimeYes", "Overtime", c("No" = 1, "Yes" = 0), width = 200)), # boolean
+                div(style="display:inline-block", selectInput("StockOptionLevel", "Stock option level", c("0" = 0, "1" = 1, "2" = 2, "3" = 3), width = 200)), # 0-3
+                div(style="display:inline-block", selectInput("EnvironmentSatisfaction", "Environment satisfaction", c("1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5), width = 200))
+              ),
+              
+              br(),
+              
+              bootstrapPage(
+                div(style="display:inline-block", selectInput("JobSatisfaction", "Job satisfaction", c("1" = 1, "2" = 2, "3" = 3, "4" = 4), width = 200)), # 1-4
+                div(style="display:inline-block", selectInput("JobLevel", "Job level", c("1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5), width = 200)), # 1-5              
+                div(style="display:inline-block", selectInput("Education", "Education", c("1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5), width = 200)) # 1-5              
+              ),
+              
+              br(),
+              
+              bootstrapPage(
+                div(style="display:inline-block", selectInput("WorkLifeBalance", "Work/life balance", c("1" = 1, "2" = 2, "3" = 3, "4" = 4), width = 200)), # 1-4    
+                div(style="display:inline-block", selectInput("MaritalStatus", "Marital status ", c("Single" = "Single", "Married" = "Married", "Divorced" = "Divorced"), width = 200)), # boolean  
+                div(style="display:inline-block", selectInput("JobInvolvement", "Job involvement", c("1" = 1, "2" = 2, "3" = 3, "4" = 4), width = 200)) # 1-4          
+              ),
+              
+              br(),
+              
+              bootstrapPage(
+                div(style="display:inline-block", numericInput("MonthlyIncome", "Monthly income", 0, width = 200)),
+                div(style="display:inline-block", numericInput("TotalWorkingYears", "Total working years", 0, width = 200)), # 1-4  
+                div(style="display:inline-block", numericInput("Age", "Age", 0, width = 200))                    
+              ),
+              
+              br(),
+              
+              bootstrapPage(
+                div(style="display:inline-block", numericInput("YearsWithCurrManager", "Years with manager", 0, width = 200)),   
+                div(style="display:inline-block", numericInput("YearsAtCompany", "Years at company", 0, width = 200)),          
+                div(style="display:inline-block", numericInput("YearsInCurrentRole", "Years in current role", 0, width = 200))     
+              ),
+              
+              br(),
+              
+              bootstrapPage(
+                div(style="display:inline-block", numericInput("DailyRate", "Daily rate", 0, width = 200)),               
+                div(style="display:inline-block", numericInput("EmployeeNumber", "Employee number", 0, width = 200)),          
+                div(style="display:inline-block", numericInput("TrainingTimesLastYear", "Trainings last year", 0, width = 200))   
+              ),
+              
+              br(),
+              
+              bootstrapPage(
+                div(style="display:inline-block", numericInput("DistanceFromHome", "Distance from home", 0, width = 200)),        
+                div(style="display:inline-block", numericInput("NumCompaniesWorked", "Companies worked at", 0, width = 200)),     
+                div(style="display:inline-block", numericInput("HourlyRate", "Hourly rate", 0, width = 200))
+              )
       )
     )
   )
@@ -271,7 +305,7 @@ server <- function(input, output) {
   
   # predict probability of attrition
   output$view <- reactive(predict(rf_optimal, values$df_data, type = "prob")[1,2])
-  output$df <- renderTable(values$df_data)
+  
 }
 
 shinyApp(ui, server)
