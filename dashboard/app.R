@@ -13,8 +13,7 @@ ui <- dashboardPage(
       menuItem("Exploratory Analysis", tabName = "exploratory_analysis", icon = icon("line-chart")),
       menuItem("Exploratory Analysis Results", tabName = "exploratory_analysis_summary", icon = icon("compass")),
       menuItem("Final Analysis", tabName = "final_analysis", icon = icon("calculator")),
-      menuItem("Interactive Model", tabName = "interactive", icon = icon("edit")),
-      menuItem("Final Results", tabName = "final_results", icon = icon("list"))
+      menuItem("Interactive Model", tabName = "interactive", icon = icon("edit"))
     )
   ),
   
@@ -66,16 +65,13 @@ ui <- dashboardPage(
                 tags$li("Once we finish all analysis, we will put everything in shiny app to form a complete project")
               )
       ),
-      # Exploratory code tab content
-      tabItem(tabName = "exploratory_analysis_code",
-              verbatimTextOutput("exploratory_code")
-      ),
       # Final analysis tab content
       tabItem(tabName = "final_analysis",
               includeMarkdown("final_analysis.md")
       ),
       # Interactive tab content
       tabItem(tabName = "interactive",
+              
               
               h2("Probability of Attrition"),
               verbatimTextOutput("view"),
@@ -84,23 +80,23 @@ ui <- dashboardPage(
               bootstrapPage(
                 div(style="display:inline-block", selectInput("OverTimeYes", "Overtime", c("No" = 1, "Yes" = 0), width = 200)), # boolean
                 div(style="display:inline-block", selectInput("StockOptionLevel", "Stock option level", c("0" = 0, "1" = 1, "2" = 2, "3" = 3), width = 200)), # 0-3
-                div(style="display:inline-block", selectInput("EnvironmentSatisfaction", "Environment satisfaction", c("1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5), width = 200))
+                div(style="display:inline-block", selectInput("EnvironmentSatisfaction", "Environment satisfaction", c("Low" = 0, "Medium" = 1, "High" = 2, "Very High" = 3), width = 200))
               ),
               
               br(),
               
               bootstrapPage(
-                div(style="display:inline-block", selectInput("JobSatisfaction", "Job satisfaction", c("1" = 1, "2" = 2, "3" = 3, "4" = 4), width = 200)), # 1-4
+                div(style="display:inline-block", selectInput("JobSatisfaction", "Job satisfaction", c("Low" = 0, "Medium" = 1, "High" = 2, "Very High" = 3), width = 200)), # 1-4
                 div(style="display:inline-block", selectInput("JobLevel", "Job level", c("1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5), width = 200)), # 1-5              
-                div(style="display:inline-block", selectInput("Education", "Education", c("1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5), width = 200)) # 1-5              
+                div(style="display:inline-block", selectInput("Education", "Education", c("Below College" = 1, "College" = 2, "Bachelors" = 3, "Masters" = 4, "Doctorate" = 5), width = 200)) # 1-5              
               ),
               
               br(),
               
               bootstrapPage(
-                div(style="display:inline-block", selectInput("WorkLifeBalance", "Work/life balance", c("1" = 1, "2" = 2, "3" = 3, "4" = 4), width = 200)), # 1-4    
+                div(style="display:inline-block", selectInput("WorkLifeBalance", "Work/life balance", c("Bad" = 1, "Good" = 2, "Better" = 3, "Best" = 4), width = 200)), # 1-4    
                 div(style="display:inline-block", selectInput("MaritalStatus", "Marital status ", c("Single" = "Single", "Married" = "Married", "Divorced" = "Divorced"), width = 200)), # boolean  
-                div(style="display:inline-block", selectInput("JobInvolvement", "Job involvement", c("1" = 1, "2" = 2, "3" = 3, "4" = 4), width = 200)) # 1-4          
+                div(style="display:inline-block", selectInput("JobInvolvement", "Job involvement", c("Low" = 1, "Medium" = 2, "High" = 3, "Very High" = 4), width = 200)) # 1-4          
               ),
               
               br(),
@@ -140,8 +136,8 @@ ui <- dashboardPage(
 )
 
 server <- function(input, output) {
-  # All code in external files for the sake of cleanliness
-  
+
+  # watch 
   MartialStatusSingle <- reactive({
     switch(input$MartialStatus,
            'Single' = 1,
@@ -233,6 +229,7 @@ server <- function(input, output) {
     )
   }
   
+  # import model from final analysis
   rf_optimal <- readRDS("rf_optimal.rda")
   
   # create reactive object to store input data
