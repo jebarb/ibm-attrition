@@ -77,7 +77,7 @@ ui <- dashboardPage(
               
               # display 3 inputs side by side
               bootstrapPage(
-                div(style="display:inline-block", selectInput("OverTimeYes", "Overtime", c("No" = 1, "Yes" = 0), width = 200)), # boolean
+                div(style="display:inline-block", selectInput("OverTimeYes", "Overtime", c("No" = 0, "Yes" = 1), width = 200)), # boolean
                 div(style="display:inline-block", selectInput("StockOptionLevel", "Stock option level", c("0" = 0, "1" = 1, "2" = 2, "3" = 3), width = 200)), # 0-3
                 div(style="display:inline-block", selectInput("EnvironmentSatisfaction", "Environment satisfaction", c("Low" = 0, "Medium" = 1, "High" = 2, "Very High" = 3), width = 200))
               ),
