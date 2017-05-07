@@ -2,9 +2,6 @@
 library(shiny)
 library(shinydashboard)
 
-source("exploratory_analysis.R")
-#source("final_analysis.R")
-
 # create UI object
 ui <- dashboardPage(
   dashboardHeader(title = "Employee Analysis"),
@@ -15,9 +12,9 @@ ui <- dashboardPage(
       menuItem("Proposal", tabName = "proposal", icon = icon("list")),
       menuItem("Exploratory Analysis", tabName = "exploratory_analysis", icon = icon("compass")),
       menuItem("Exploratory Analysis Results", tabName = "exploratory_analysis_summary", icon = icon("list")),
-      menuItem("Exploratory Analysis Code", tabName = "exploratory_analysis_code", icon = icon("compass")),
       menuItem("Final Analysis", tabName = "final_analysis", icon = icon("compass")),
-      menuItem("Interactive Model", tabName = "interactive", icon = icon("bar-chart"))
+      menuItem("Interactive Model", tabName = "interactive", icon = icon("bar-chart")),
+      menuItem("Final Results", tabName = "final_results", icon = icon("compass"))
     )
   ),
   
@@ -46,43 +43,7 @@ ui <- dashboardPage(
       ),
       # Exploratory analysis tab content
       tabItem(tabName = "exploratory_analysis",
-              h2("Exploratory Analysis"),
-              h4("Graph of average monthly income across all roles faceted by gender"),
-              plotOutput("exploratory_plot1", width = 600, height = 500),
-              h4("Graph of percent of employee lost across job roles"),
-              plotOutput("exploratory_plot2", width = 600, height = 500),
-              h4("Average monthly income based on Marital status"),
-              plotOutput("exploratory_plot3", width = 600, height = 500),
-              h4("Average monthly income across different levels of Relationship satisfaction."),
-              plotOutput("exploratory_plot4", width = 600, height = 500),
-              h4("Average monthly income across different levels of Job Satisfaction."),
-              plotOutput("exploratory_plot5", width = 600, height = 500),
-              h4("There is no significant linear relationship between Work life balance and years since last promotion"),
-              verbatimTextOutput("exploratory_plot6"),
-              h4("There is no relationship between performance rating and monthly income"),
-              plotOutput("exploratory_plot7", width = 600, height = 500),
-              p('The figure below is also the visualization of correlations between 5 features. 
-                The distribution of each variable is shown on the diagonal.
-                On the bottom of the diagonal : the bivariate scatter plots with a fitted line are isplayed
-                On the top of the diagonal : the value of the correlation plus the significance level as stars. 
-                Each significance level is associated to a symbol : p-values(0, 0.001, 0.01, 0.05, 0.1, 1) <=> symbols(“***”, “**”, “*”, “.”, " “)'),
-              tableOutput("exploratory_plot8"),
-              h4(""),
-              plotOutput("exploratory_plot9", width = 600, height = 500),
-              h4("The figure below shows female has higher avarage salary than males in IBM."),
-              plotOutput("exploratory_plot10", width = 600, height = 500),
-              h4("The below plot shows gender distribution of gender across jobs"),
-              plotOutput("exploratory_plot11", width = 600, height = 500),
-              h4("The figure below illastrates the job distribution between male and female."),
-              plotOutput("exploratory_plot12", width = 600, height = 500),
-              h4("add info on plot 13"),
-              plotOutput("exploratory_plot13", width = 600, height = 500),
-              h4("add info on plot 14"),
-              plotOutput("exploratory_plot14", width = 600, height = 500),
-              h4("add info on plot 15"),
-              plotOutput("exploratory_plot15", width = 600, height = 500),
-              h4("add info on plot 16"),
-              plotOutput("exploratory_plot16", width = 600, height = 500)
+              includeMarkdown("exploratory_analysis.md")
       ),
       # Exploratory analysis summary tab content
       tabItem(tabName = "exploratory_analysis_summary",
@@ -123,25 +84,6 @@ ui <- dashboardPage(
 
 server <- function(input, output) {
   # All code in external files for the sake of cleanliness
-  # Render all plots to be displayed in dashboard
-  output$exploratory_plot1 <- renderPlot(exploratory_plot1)
-  output$exploratory_plot2 <- renderPlot(exploratory_plot2)
-  output$exploratory_plot3 <- renderPlot(exploratory_plot3)
-  output$exploratory_plot4 <- renderPlot(exploratory_plot4)
-  output$exploratory_plot5 <- renderPlot(exploratory_plot5)
-  output$exploratory_plot6 <- renderPrint(exploratory_plot6)
-  output$exploratory_plot7 <- renderPlot(boxplot(MonthlyIncome~WorkLifeBalance,data = employee,xlab="PerformanceRating", ylab="MonthlyIncome"))
-  output$exploratory_plot8 <- renderTable(exploratory_plot8)
-  output$exploratory_plot9 <- renderPlot(chart.Correlation(numeric, histogram=TRUE, pch=19))
-  output$exploratory_plot10 <- renderPlot(exploratory_plot10)
-  output$exploratory_plot11 <- renderPlot(exploratory_plot11)
-  output$exploratory_plot12 <- renderPlot(exploratory_plot12)
-  output$exploratory_plot13 <- renderPlot(corrplot(correlation_data,method="circle"))
-  output$exploratory_plot14 <- renderPlot(exploratory_plot14)
-  output$exploratory_plot15 <- renderPlot(exploratory_plot15)
-  output$exploratory_plot16 <- renderPlot(exploratory_plot16)
-  output$exploratory_code <- renderText(readChar("exploratory_analysis.R", file.info("exploratory_analysis.R")$size))
-  
 }
 
 shinyApp(ui, server)
