@@ -462,6 +462,8 @@ the model.
     ## 
     ## Tuning parameter 'mtry' was held constant at a value of 3
 
+    saveRDS(rf_optimal, file = "rf_optimal.rda")
+
     #analyzing performance
     predictors <- names(trainBalance)[names(trainBalance) != 'Attrition']
     length(predictors)
@@ -493,3 +495,29 @@ Decreasing the number of feature and improving the performance of model
 are always a trad-off problem. But there are also many ways to improve,
 such as changing the number of selected features or using other features
 to build model, in order to reach a balance.
+
+Conclusion:
+-----------
+
+We were able to accomplish our two main objectives. Develop an accurate
+model for predicting employee attrition and identify possible areas of
+discrimination based on various characteristics. By utilizing various
+types of graph we were able to emphasize the trends by possible gender
+discrimination, and employee attrition. Though as we answered our
+objective questions, we began developing questions that could not be
+answered by the dataset such as how happy are IBM employees, was this
+data comparable to other technology companies, and also what incentive
+systems are in place to ensure accurate responses from employees and
+incentive to perform well.
+
+The most prominent income gap between genders was presented in
+higher-level job roles such as Manager and Research director. One of
+these gaps represented a $18,168 difference in yearly salary, which
+should be alarming to the Human resource department. Other
+characteristics of attrition we found were that based on job roles
+Healthcare representatives, manufacturing directors, and laboratory
+technicians, which represented the top three jobs employees leave. What
+we would recommend is reviewing the hiring process and criteria for
+these positions, understanding the responsibilities they hold, and
+whether their working environment emphasizes a long-term relationship
+with the company.
