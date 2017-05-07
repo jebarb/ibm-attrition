@@ -11,7 +11,6 @@ ui <- dashboardPage(
     sidebarMenu(
       menuItem("Proposal", tabName = "proposal", icon = icon("list")),
       menuItem("Exploratory Analysis", tabName = "exploratory_analysis", icon = icon("line-chart")),
-      menuItem("Exploratory Analysis Results", tabName = "exploratory_analysis_summary", icon = icon("compass")),
       menuItem("Final Analysis", tabName = "final_analysis", icon = icon("calculator")),
       menuItem("Interactive Model", tabName = "interactive", icon = icon("edit"))
     )
@@ -43,27 +42,6 @@ ui <- dashboardPage(
       # Exploratory analysis tab content
       tabItem(tabName = "exploratory_analysis",
               includeMarkdown("exploratory_analysis.md")
-      ),
-      # Exploratory analysis summary tab content
-      tabItem(tabName = "exploratory_analysis_summary",
-              h2("Exploratory Analysis Results"),
-              h3("Some results we have found"),
-              tags$ul(
-                tags$li("In IBM, average monthly salary of female(6686.566) is higher than that of male (6380.508), which is out of what we expected"),
-                tags$li("Across all job roles, the different pay between women and men are marginal"),
-                tags$li("On higher position such as manager or manufacturing director, number of female and male are pretty much equal. But positions of sales executive and research scientist have attracted more male employees than females"),
-                tags$li("As for marital status, people married or divorced have higher income than people are single, which is interesting to see. It’s also reasonable because they may have longer working years and higher position level. In this case, we plan to explore if job position concur with marital status"),
-                tags$li("The performance rating in the dataset is either 3 or 4 (good or excellent), maybe everyone at IBM is good at their work"),
-                tags$li("There is no strong correlation between work life balance and years in company or years in position. Also monthly income has trivial influence on work life balance"),
-                tags$li("There is positive linear relationship between years at company and years since last promotion, with a significant adjusted R^2 0.382")
-              ),
-              h3("Next steps"),
-              tags$ul(
-                tags$li("Continue running on feature selection to delete irrelevant ones"),
-                tags$li("Continue on model selection and compare the accuracy between different models"),
-                tags$li("Perform logistic regression on employee attrition"),
-                tags$li("Once we finish all analysis, we will put everything in shiny app to form a complete project")
-              )
       ),
       # Final analysis tab content
       tabItem(tabName = "final_analysis",

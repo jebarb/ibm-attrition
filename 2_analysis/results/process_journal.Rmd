@@ -2,7 +2,7 @@
 title: "Process Journal"
 author: "Ria Pan, James Barbour, Fahmi Khalid"
 date: "May 6, 2017"
-output: md_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -13,7 +13,6 @@ library(PerformanceAnalytics)
 library(Hmisc)
 library(corrplot)
 library(ggthemes)
-library(dplyr)
 library(pROC)
 library(caret)
 library(DMwR)
@@ -21,20 +20,20 @@ library(randomForest)
 library(e1071)
 ```
 
-##Abstract
+#Abstract
 
-The purpose of this project is to analyze data provided from IBM’s Human resource department in order to understand the common characteristics in employee attrition, or possible employee discrimination. In order to weight the importance of each variable presented, we filtered the data based on variables that were integer type and performed a correlation analysis. By doing so we were able to develop a basic understanding of which variables to include in our predictive model. The predictive model that we have developed has proven to predict employee attrition with an 84% accuracy rate. We also wanted to consider relationships in non-integer type variables in hopes of observing possible discrimination trends that can be supported by the dataset. We developed a number of visuals in order to justify our conclusions. Lastly, we strived to develop a user-friendly Shiny app for possible managers to use in order to predict employee attrition. All code and details shall be presented in the appropriate Rmd files as part of the final project. 
+The purpose of this project is to analyze data provided from IBM’s Human resource department in order to understand the common characteristics in employee attrition, or possible employee discrimination. In order to weight the importance of each variable presented, we filtered the data based on variables that were integer type and performed a correlation analysis. By doing so we were able to develop a basic understanding of which variables to include in our predictive model. The predictive model that we have developed has proven to predict employee attrition with an 84% accuracy rate. We also wanted to consider relationships in non-integer type variables in hopes of observing possible discrimination trends that can be supported by the dataset. We developed a number of visuals in order to justify our conclusions. Lastly, we strived to develop a user-friendly Shiny app for possible managers to use in order to predict employee attrition. All code and details shall be presented in the appropriate Rmd files as part of the final project. The final app can be viewed by running the app in the 'dashboard folder' or can be viewed at http://390.jebarb.com.
 
-##Overview and Motivation: 
+#Overview and Motivation: 
 
 The issue of keeping one's employees happy and satisfied is a perennial and age-old challenge. If an employee you have invested so much time and money leaves for "greener pastures", then this would mean that you would have to spend even more time and money to hire somebody else. Alongside these reason maintaining happy employees have resulted in increase profit for companies based on various studies done in industry. By understanding the main reasons why employees leave and possible discrimination, the increase probability your company will succeed. 
 
 
-##Related Work
+#Related Work
 
 In class we had discussed effective techniques of communication. As a team we took that to heart and wanted to develop models that were not only easy to understand but visually pleasing. We have looked into various psychology journals, which study employee habits and utility in order to develop a healthy reasoning of what possible variables are important based on published studies.
 
-##Initial Questions
+#Initial Questions
 *	Does Marital Status have a significant effect on wages?
 *	How does performance rating contribute to monthly income? 
 *	How do different departments contribute to employee attrition?
@@ -79,14 +78,13 @@ roles_quit <- str_count(Job_roles)
 loss_by_job <- data_frame(Job=Job_roles, "Percentage loss"=(roles_quit/1470)*100)
 loss_by_job <- loss_by_job %>% mutate(round_loss=round(loss_by_job$`Percentage loss`,digits=2))
 loss_by_job <- arrange(loss_by_job, desc(round_loss))
-exploratory_plot2 <- ggplot(loss_by_job, aes(x=reorder(loss_by_job$Job,-loss_by_job$round_loss),y=loss_by_job$round_loss))+
+ggplot(loss_by_job, aes(x=reorder(loss_by_job$Job,-loss_by_job$round_loss),y=loss_by_job$round_loss))+
   geom_bar(stat = "identity",width=0.5, position=position_dodge())+
   geom_text(aes(label=loss_by_job$round_loss), vjust=1.6, color="white",
             position = position_dodge(0.9), size=3.5)+
   theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))+
   labs(x="Job Roles",y="Percentage of Loss")+
   ggtitle("Loss percentage across different Job Roles")
-exploratory_plot2
 #Found all job roles that had quit and counted each position. Then divided the total count of each position by total observation. Arranged the loss by decreasing amount and graphed using bar plot using similar labels as exploratory plot 1.
 ```
 
@@ -95,13 +93,12 @@ We wanted to know based on Job roles where was the attrition coming from? With t
 ```{r}
 # plot3
 testing <- employee %>% group_by(MaritalStatus) %>% summarise(mean=round(mean(MonthlyIncome),digits=0))
-exploratory_plot3 <- ggplot(testing, aes(x=testing$MaritalStatus,y=testing$mean))+
+ggplot(testing, aes(x=testing$MaritalStatus,y=testing$mean))+
   geom_bar(stat = "identity",width=0.5, position=position_dodge())+
   geom_text(aes(label=testing$mean), vjust=1.6, color="white",
             position = position_dodge(0.9), size=3.5)+
   labs(x="Marital Status",y="Average Monthly Income")+
   ggtitle("Put a ring on it")
-exploratory_plot3
 
 #Group the original data set by Marital status and summarize mean monthly income. Then graphed the monthly income averages according to each category of marital status.
 ```
@@ -111,13 +108,12 @@ After grouping by relationship status, we averaged the monthly income in order t
 ```{r}
 # plot4
 RelSat <-employee %>% group_by(RelationshipSatisfaction) %>% summarise(mean=mean(MonthlyIncome))
-exploratory_plot4 <- ggplot(RelSat, aes(x=reorder(RelSat$RelationshipSatisfaction,-RelSat$mean),y=RelSat$mean))+
+ggplot(RelSat, aes(x=reorder(RelSat$RelationshipSatisfaction,-RelSat$mean),y=RelSat$mean))+
   geom_bar(stat = "identity",width=0.5, position=position_dodge())+
   geom_text(aes(label=round(RelSat$mean)), vjust=1.6, color="white",
             position = position_dodge(0.9), size=3.5)+
   labs(x="Relationship Satisfaction",y="Average Monthly Income")+
   ggtitle("99 Problems")
-exploratory_plot4
 
 #Grouped the original data set based on Relationship Satisfaction and summarized average monthly income. Present the average monthly incomes based on Relationship Satisfaction using a bar graph and used appropriate labels.
 
@@ -129,13 +125,12 @@ Similar to the first plot we grouped our x-axis by “Relationship Satisfaction�
 # plot5
 JobSat <- employee %>% group_by( JobSatisfaction) %>% summarise(mean=mean(MonthlyIncome))
 Jobsatty <- c("Low", "Medium", "High", "Very High")
-exploratory_plot5 <- ggplot(JobSat, aes(x=reorder(Jobsatty,-JobSat$mean),y=JobSat$mean))+
+ggplot(JobSat, aes(x=reorder(Jobsatty,-JobSat$mean),y=JobSat$mean))+
   geom_bar(stat = "identity",width=0.5, position=position_dodge())+
   geom_text(aes(label=round(JobSat$mean)), vjust=1.6, color="white",
             position = position_dodge(0.9), size=3.5)+
   labs(x="Job Satisfaction",y="Average Monthly Income")+
   ggtitle("Mo Money Mo Problems")
-exploratory_plot5
 
 #Grouped the original data set based on Job Satisfaction and summarized average monthly income. Present the average monthly incomes based on Job Satisfaction using a bar graph and used appropriate labels.
 ```
@@ -145,18 +140,16 @@ We observed the average monthly income based on Job satisfaction and found an in
 ```{r}
 # plot6
 lin_reg <- lm(WorkLifeBalance~ YearsSinceLastPromotion, employee)
-exploratory_plot6 <- summary(lin_reg)
-exploratory_plot6
-#explored linear regression of work life balance against years since last promotion and summarized.
+summary(lin_reg)
 
+#explored linear regression of work life balance against years since last promotion and summarized.
 ```
 
 This is a summary of a linear regression of Work life balance against Years since last promotion in an attempt to distinguish the overall atmosphere and attitude an employee who stays longer with the company develops. The results were inconclusive.
 
 ```{r}
 # plot7
-exploratory_plot7 <- boxplot(MonthlyIncome~WorkLifeBalance,data = employee,xlab="Work Life Balance", ylab="Monthly Income")
-exploratory_plot7
+boxplot(MonthlyIncome~WorkLifeBalance,data = employee,xlab="Work Life Balance", ylab="Monthly Income")
 
 #Created a boxplot using monthly income as the y-axis and Work life balance as x-asxis. Then used appropriate labels 
 ```
@@ -179,24 +172,23 @@ flattenCorrMatrix <- function(cormat, pmat) {
   )
 }
 
-exploratory_plot8 <- flattenCorrMatrix(res2$r, res2$P)
-exploratory_plot8
+flattenCorrMatrix(res2$r, res2$P)
+```
+
+```{r}
 # plot9
-exploratory_plot9 <- chart.Correlation(numeric, histogram=TRUE, pch=19)
-exploratory_plot9
+suppressWarnings(chart.Correlation(numeric, histogram=TRUE, pch=19))
 ```
 
 Performing a correlation against Age, daily rate, distance from home, education, and employee number we did not find any significant correlation. Thus later on we decided to perform a correlation on all numeric variables against each other. 
 
 ```{r}
-
 # plot10
 genderIncome <- employee %>% group_by(Gender) %>%
   summarise(meanSalary = mean(MonthlyIncome))
-exploratory_plot10 <- ggplot(genderIncome, aes (x = Gender, y = meanSalary)) +  ggtitle("Mean monthly income between gender ")+ geom_bar(stat = "identity",width=0.5, position=position_dodge())+
+ggplot(genderIncome, aes (x = Gender, y = meanSalary)) +  ggtitle("Mean monthly income between gender ")+ geom_bar(stat = "identity",width=0.5, position=position_dodge())+
   geom_text(aes(label=round(meanSalary)), vjust=1.6, color="white",
             position = position_dodge(0.9), size=3.5)
-exploratory_plot10
 #Grouped the original data set by gender and summarized average monthly salary. This bar graph represents the average monthly salary general between genders. Used similar labels as exploratory plot 1.
 ```
 
@@ -204,9 +196,8 @@ As a general plot we wanted to understand, regardless of job roles, education, o
 
 ```{r}
 # plot11
-exploratory_plot11 <- ggplot(employee, aes(x = Gender, color = Gender)) +
+ggplot(employee, aes(x = Gender, color = Gender)) +
   geom_bar()+ facet_wrap(~ JobRole)+ggtitle("Job distribution among gender")+ ggtitle("Job distribution across gender ")
-exploratory_plot11
 
 #Decided to develop a visual of the amount of employees based on gender across all departments. Using geom_bar we were able to find interesting distributions.
 
@@ -218,9 +209,8 @@ Understanding how many females and males account for job roles is also an import
 # plot12
 genderJobIncome <- employee  %>% group_by(Gender, JobRole) %>%
   summarise(meanSalarybyJob = mean(MonthlyIncome))
-exploratory_plot12 <- ggplot(genderJobIncome, aes(x = JobRole,y = meanSalarybyJob, color = Gender)) +
+ggplot(genderJobIncome, aes(x = JobRole,y = meanSalarybyJob, color = Gender)) +
   geom_point() +ggtitle("Mean monthly income among diffrent jobs across gender ")
-exploratory_plot12
 #By group gender and Job role we then summarized average monthly income and represented it in a scatter plot. Using appropriate labels as exploratory plot 1.
 ```
 
@@ -233,8 +223,7 @@ employee$Attrition[employee$Attrition=="No"] <- 0
 integer_data <-employee[,c(1,2,4,6,7,10,11,13,14,15,17,19,20,21,24,25,26,28:35)]
 integer_data$Attrition <-as.numeric(integer_data$Attrition)
 correlation_data <- cor(integer_data)
-exploratory_plot13 <-corrplot(correlation_data,method="circle")
-exploratory_plot13
+corrplot(correlation_data,method="circle")
 
 #First replacing the "Yes" and "No" reponses in the original data set under the attrition column to numeric type allowed us to use it with ease in certain facets wraps. By creating a new data set from only the integer based types of the original variables we were able to develop a correlation between all integer variables.
 ```
@@ -254,11 +243,10 @@ We could have coded a correlation for each variable we may have thought was impo
 ```{r}
 # plot14
 quit <- filter(employee, Attrition==1)
-exploratory_plot14 <-ggplot(data=quit)+
+ggplot(data=quit)+
   geom_point(aes(y=quit$MonthlyIncome, x=quit$BusinessTravel,color=JobRole))+
   labs(y="Monthly Income", x="Travels")+
   ggtitle("Attritions trend Income VS Travel")
-exploratory_plot14
 #By segmenting the original data set into only those who have quit, we then used a scatter plot to examine job roles based on travel frequency.
 ```
 
@@ -266,11 +254,10 @@ By filtering the employees who have quit, we then graphed monthly average income
 
 ```{r}
 # plot15
-exploratory_plot15 <-ggplot(data=employee)+
+ggplot(data=employee)+
   geom_point(aes(y=employee$MonthlyIncome, x=employee$TotalWorkingYears,color=JobRole))+
   labs(y="Monthly Income", x="Working Years")+
   ggtitle("Observing trend of Income VS Working Years")
-exploratory_plot15
 # Created a scatter plot that used Monthly income as the y-axis and x-axis as working years faceted against job roles.
 ```
 
@@ -278,17 +265,32 @@ We placed working years as the x-axis and monthly income as the y-axis to develo
 
 ```{r}
 # plot16
-exploratory_plot16 <- ggplot(data=employee)+
+ggplot(data=employee)+
   geom_point(aes(y=employee$PercentSalaryHike, x=employee$PerformanceRating))+
   labs(y="Percentage Hike", x="Performance Rating")+
   ggtitle("Attritions trend Percentage Hike VS Performance Rating")+
   facet_wrap(~Attrition)
-exploratory_plot16
 
 # Created scatter plot with Percent salary hike as y-axis and Performance rating as x-axis.
 ```
 
 Using the entire dataset we set Performance rating as the independent variable and Performance salary hike as the dependent variable. What we observed was that Performance rating only resulted in a rating of 3 or 4, which made an interesting find as a trend of the company but at the same time did not provide much to conclude on.
+
+#Results
+##Some results we have found
+* In IBM, average monthly salary of female(6686.566) is higher than that of male (6380.508), which is out of what we expected
+* Across all job roles, the different pay between women and men are marginal
+* On higher position such as manager or manufacturing director, number of female and male are pretty much equal. But positions of sales executive and research scientist have attracted more male employees than females
+* As for marital status, people married or divorced have higher income than people are single, which is interesting to see. It’s also reasonable because they may have longer working years and higher position level. In this case, we plan to explore if job position concur with marital status
+* The performance rating in the dataset is either 3 or 4 (good or excellent), maybe everyone at IBM is good at their work
+* There is no strong correlation between work life balance and years in company or years in position. Also monthly income has trivial influence on work life balance
+* There is positive linear relationship between years at company and years since last promotion, with a significant adjusted R^2 0.382
+
+##Next steps
+* Continue running on feature selection to delete irrelevant ones
+* Continue on model selection and compare the accuracy between different models
+* Perform logistic regression on employee attrition
+* Once we finish all analysis, we will put everything in shiny app to form a complete project
 
 #Final Analysis
 
@@ -406,7 +408,7 @@ Grid Search: define a grid of algorithm parameters to try.
 
 We performed grid search by setting mtry =c(1:23). The result based on training accuracy gives us the optimal model when mtry =3. So we use this tuned parameter to build our final model. 
 
-```{r eval = FALSE}
+```{r eval = TRUE}
 #grid search to choose the best mtry
 control <- trainControl(method="repeatedcv", number=10, repeats=3, search="grid")
 set.seed(1234)
