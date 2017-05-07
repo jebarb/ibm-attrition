@@ -233,6 +233,7 @@ set.seed(1234)
 tunegrid <- expand.grid(.mtry= 3)
 rf_optimal <- train(Attrition~., data=trainBalance, method="rf", metric="Accuracy", tuneGrid=tunegrid, trControl=control)
 rf_optimal
+saveRDS(rf_optimal, file = "rf_optimal.rda")
 ```
 
 ```{r}

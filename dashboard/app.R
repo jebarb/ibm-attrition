@@ -76,7 +76,30 @@ ui <- dashboardPage(
       ),
       # Interactive tab content
       tabItem(tabName = "interactive",
-              h2("content")
+              numericInput("tmp", "num", 0),
+              numericInput("OverTimeYes", "OverTimeYes", 0),            
+              numericInput("StockOptionLevel", "StockOptionLevel", 0),      
+              numericInput("TotalWorkingYears", "TotalWorkingYears", 0),      
+              numericInput("MonthlyIncome", "MonthlyIncome", 0),
+              numericInput("JobInvolvement", "JobInvolvement", 0),          
+              numericInput("Age", "Age", 0),                    
+              numericInput("EnvironmentSatisfaction", "EnvironmentSatisfaction", 0), 
+              numericInput("JobSatisfaction", "JobSatisfaction", 0),         
+              numericInput("YearsWithCurrManager", "YearsWithCurrManager", 0),   
+              numericInput("YearsAtCompany", "YearsAtCompany", 0),          
+              numericInput("JobLevel", "JobLevel", 0),                
+              numericInput("YearsInCurrentRole", "YearsInCurrentRole", 0),     
+              numericInput("DailyRate", "DailyRate", 0),               
+              numericInput("EmployeeNumber", "EmployeeNumber", 0),          
+              numericInput("TrainingTimesLastYear", "TrainingTimesLastYear", 0),  
+              numericInput("DistanceFromHome", "DistanceFromHome", 0),        
+              numericInput("Education", "Education", 0),               
+              numericInput("NumCompaniesWorked", "NumCompaniesWorked", 0),     
+              numericInput("HourlyRate", "HourlyRate", 0),              
+              numericInput("WorkLifeBalance", "WorkLifeBalance", 0),         
+              numericInput("MaritalStatusMarried", "MaritalStatusMarried", 0),   
+              numericInput("MaritalStatusSingle", "MaritalStatusSingle", 0),  
+              verbatimTextOutput("view")
       )
     )
   )
@@ -84,6 +107,103 @@ ui <- dashboardPage(
 
 server <- function(input, output) {
   # All code in external files for the sake of cleanliness
+  
+  construct_df <- function() {
+    data.frame(
+      "OverTimeYes" = input$OverTimeYes,
+      "StockOptionLevel" = input$StockOptionLevel,
+      "TotalWorkingYears" = input$TotalWorkingYears,
+      "MonthlyIncome" = input$MonthlyIncome,
+      "JobInvolvement" = input$JobInvolvement,
+      "Age" = input$Age,
+      "EnvironmentSatisfaction" = input$EnvironmentSatisfaction,
+      "JobSatisfaction" = input$JobSatisfaction,
+      "YearsWithCurrManager" = input$YearsWithCurrManager,
+      "YearsAtCompany" = input$YearsAtCompany,
+      "JobLevel" = input$JobLevel,
+      "YearsInCurrentRole" = input$YearsInCurrentRole,
+      "DailyRate" = input$DailyRate,
+      "EmployeeNumber" = input$EmployeeNumber,
+      "TrainingTimesLastYear" = input$TrainingTimesLastYear,
+      "DistanceFromHome" = input$DistanceFromHome,
+      "Education" = input$Education,
+      "NumCompaniesWorked" = input$NumCompaniesWorked,
+      "HourlyRate" = input$HourlyRate,
+      "WorkLifeBalance" = input$WorkLifeBalance,
+      "MaritalStatusMarried" = input$MaritalStatusMarried,
+      "MaritalStatusSingle" = input$MaritalStatusSingle
+    )
+  }
+  
+  rf_optimal <- readRDS("rf_optimal.rda")
+  values <- reactiveValues(df_data = NULL)
+  observeEvent(input$OverTimeYes, {
+    values$df_data <- construct_df()
+  })
+  observeEvent(input$StockOptionLevel, {
+    values$df_data <- construct_df()
+  })
+  observeEvent(input$TotalWorkingYears, {
+    values$df_data <- construct_df()
+  })
+  observeEvent(input$MonthlyIncome, {
+    values$df_data <- construct_df()
+  })
+  observeEvent(input$JobInvolvement, {
+    values$df_data <- construct_df()
+  })
+  observeEvent(input$Age, {
+    values$df_data <- construct_df()
+  })
+  observeEvent(input$EnvironmentSatisfaction, {
+    values$df_data <- construct_df()
+  })
+  observeEvent(input$JobSatisfaction, {
+    values$df_data <- construct_df()
+  })
+  observeEvent(input$YearsWithCurrManager, {
+    values$df_data <- construct_df()
+  })
+  observeEvent(input$YearsAtCompany, {
+    values$df_data <- construct_df()
+  })
+  observeEvent(input$JobLevel, {
+    values$df_data <- construct_df()
+  })
+  observeEvent(input$YearsInCurrentRole, {
+    values$df_data <- construct_df()
+  })
+  observeEvent(input$DailyRate, {
+    values$df_data <- construct_df()
+  })
+  observeEvent(input$EmployeeNumber, {
+    values$df_data <- construct_df()
+  })
+  observeEvent(input$TrainingTimesLastYear, {
+    values$df_data <- construct_df()
+  })
+  observeEvent(input$DistanceFromHome, {
+    values$df_data <- construct_df()
+  })
+  observeEvent(input$Education, {
+    values$df_data <- construct_df()
+  })
+  observeEvent(input$NumCompaniesWorked, {
+    values$df_data <- construct_df()
+  })
+  observeEvent(input$HourlyRate, {
+    values$df_data <- construct_df()
+  })
+  observeEvent(input$WorkLifeBalance, {
+    values$df_data <- construct_df()
+  })
+  observeEvent(input$MaritalStatusMarried, {
+    values$df_data <- construct_df()
+  })
+  observeEvent(input$MaritalStatusSingle, {
+    values$df_data <- construct_df()
+  })
+  output$view <- reactive(predict(rf_optimal, values$df_data, type = "prob")[1,2])
 }
 
 shinyApp(ui, server)
