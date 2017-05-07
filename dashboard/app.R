@@ -17,9 +17,7 @@ ui <- dashboardPage(
       menuItem("Exploratory Analysis Results", tabName = "exploratory_analysis_summary", icon = icon("list")),
       menuItem("Exploratory Analysis Code", tabName = "exploratory_analysis_code", icon = icon("compass")),
       menuItem("Final Analysis", tabName = "final_analysis", icon = icon("compass")),
-      menuItem("Final Analysis Results", tabName = "final_analysis_summary", icon = icon("list")),
-      menuItem("Final Analysis Code", tabName = "final_analysis_code", icon = icon("compass")),
-      menuItem("Interactive Analysis", tabName = "interactive", icon = icon("bar-chart"))
+      menuItem("Interactive Model", tabName = "interactive", icon = icon("bar-chart"))
     )
   ),
   
@@ -114,10 +112,6 @@ ui <- dashboardPage(
       # Final analysis tab content
       tabItem(tabName = "final_analysis",
               includeMarkdown("final_analysis.md")
-      ),
-      # Final analysis results tab content
-      tabItem(tabName = "final_analysis_results",
-              h2("content")
       ),
       # Interactive tab content
       tabItem(tabName = "interactive",

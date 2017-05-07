@@ -1,0 +1,125 @@
+library(tidyverse)
+library(stringr)
+library(PerformanceAnalytics)
+library(Hmisc)
+library(corrplot)
+
+employee <- read_csv("WA_Fn-UseC_-HR-Employee-Attrition.csv")
+quit <- filter(employee, Attrition=="Yes")
+stayed <- filter(employee, Attrition=="No")
+
+# plot1
+gender_influence <- employee %>% group_by(Gender, JobRole) %>% summarise(average_monthly_income=mean(MonthlyIncome))
+gender_influence_monthlyincome <- gender_influence %>% mutate(round_income=round(average_monthly_income))
+exploratory_plot1 <- ggplot(gender_influence_monthlyincome, aes(x=Gender,y=average_monthly_income, color=Gender))+
+  geom_bar(stat = "identity",width=0.5,position=position_dodge())+
+  geom_text(aes(label=round_income), vjust=1.6, color="white",
+            position = position_dodge(0.9), size=3.5)+
+  facet_wrap(~JobRole)+
+  theme_minimal()+
+  scale_fill_manual(values=c("red", "blue"))+
+  ggtitle("Monthly incomes across Job Roles")+
+  scale_y_continuous(name="Average Monthly Income")
+
+# plot2
+Job_roles <- unique(quit$JobRole)
+roles_quit <- str_count(Job_roles)
+loss_by_job <- data_frame(Job=Job_roles, "Percentage loss"=(roles_quit/1470)*100)
+loss_by_job <- loss_by_job %>% mutate(round_loss=round(loss_by_job$`Percentage loss`,digits=2))
+loss_by_job <- arrange(loss_by_job, desc(round_loss))
+exploratory_plot2 <- ggplot(loss_by_job, aes(x=reorder(loss_by_job$Job,-loss_by_job$round_loss),y=loss_by_job$round_loss))+
+  geom_bar(stat = "identity",width=0.5, position=position_dodge())+
+  geom_text(aes(label=loss_by_job$round_loss), vjust=1.6, color="white",
+            position = position_dodge(0.9), size=3.5)+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))+
+  labs(x="Job Roles",y="Percentage of Loss")+
+  ggtitle("Loss percentage across different Job Roles")
+
+# plot3
+testing <- employee %>% group_by(MaritalStatus) %>% summarise(mean=round(mean(MonthlyIncome),digits=0))
+exploratory_plot3 <- ggplot(testing, aes(x=testing$MaritalStatus,y=testing$mean))+
+  geom_bar(stat = "identity",width=0.5, position=position_dodge())+
+  geom_text(aes(label=testing$mean), vjust=1.6, color="white",
+            position = position_dodge(0.9), size=3.5)+
+  labs(x="Marital Status",y="Average Monthly Income")+
+  ggtitle("Put a ring on it")
+
+# plot4
+RelSat <-employee %>% group_by(RelationshipSatisfaction) %>% summarise(mean=mean(MonthlyIncome))
+exploratory_plot4 <- ggplot(RelSat, aes(x=reorder(RelSat$RelationshipSatisfaction,-RelSat$mean),y=RelSat$mean))+
+  geom_bar(stat = "identity",width=0.5, position=position_dodge())+
+  geom_text(aes(label=round(RelSat$mean)), vjust=1.6, color="white",
+            position = position_dodge(0.9), size=3.5)+
+  labs(x="Relationship Satisfaction",y="Average Monthly Income")+
+  ggtitle("99 Problems")
+
+# plot5
+JobSat <- employee %>% group_by( JobSatisfaction) %>% summarise(mean=mean(MonthlyIncome))
+Jobsatty <- c("Low", "Medium", "High", "Very High")
+exploratory_plot5 <- ggplot(JobSat, aes(x=reorder(Jobsatty,-JobSat$mean),y=JobSat$mean))+
+  geom_bar(stat = "identity",width=0.5, position=position_dodge())+
+  geom_text(aes(label=round(JobSat$mean)), vjust=1.6, color="white",
+            position = position_dodge(0.9), size=3.5)+
+  labs(x="Job Satisfaction",y="Average Monthly Income")+
+  ggtitle("Mo Money Mo Problems")
+
+# plot6
+lin_reg <- lm(WorkLifeBalance~ YearsSinceLastPromotion, employee)
+exploratory_plot6 <- summary(lin_reg)
+
+# plot8
+numeric <- employee[, c(1,4,6,7,10)]
+#see correlation between features 
+res2 <- rcorr(as.matrix(numeric)) # data must be a matrix 
+
+flattenCorrMatrix <- function(cormat, pmat) {
+  ut <- upper.tri(cormat)
+  data.frame(
+    row = rownames(cormat)[row(cormat)[ut]],
+    column = rownames(cormat)[col(cormat)[ut]],
+    cor  =(cormat)[ut],
+    p = pmat[ut]
+  )
+}
+
+exploratory_plot8 <- flattenCorrMatrix(res2$r, res2$P)
+
+# plot10
+genderIncome <- employee %>% group_by(Gender) %>%
+  summarise(meanSalary = mean(MonthlyIncome))
+exploratory_plot10 <- ggplot(genderIncome, aes (x = Gender, y = meanSalary)) + geom_bar(stat ="identity") + ggtitle("Mean monthly income between gender ")
+
+# plot11
+exploratory_plot11 <- ggplot(employee, aes(x = Gender, color = Gender)) +
+  geom_bar()+ facet_wrap(~ JobRole)+ggtitle("Job distribution among gender")+ ggtitle("Job distribution across gender ")
+
+# plot12
+genderJobIncome <- employee  %>% group_by(Gender, JobRole) %>%
+  summarise(meanSalarybyJob = mean(MonthlyIncome))
+exploratory_plot12 <- ggplot(genderJobIncome, aes(x = JobRole,y = meanSalarybyJob, color = Gender)) +
+  geom_point() +ggtitle("Mean monthly income among diffrent jobs across gender ")
+
+# plot13
+employee$Attrition[employee$Attrition=="Yes"] <- 1
+employee$Attrition[employee$Attrition=="No"] <- 0
+integer_data <-employee[,c(1,2,4,6,7,10,11,13,14,15,17,19,20,21,24,25,26,28:35)]
+integer_data$Attrition <-as.numeric(integer_data$Attrition)
+correlation_data <- cor(integer_data)
+# plot14
+quit <- filter(employee, Attrition==1)
+exploratory_plot14 <-ggplot(data=quit)+
+  geom_point(aes(y=quit$MonthlyIncome, x=quit$BusinessTravel,color=JobRole))+
+  labs(y="Monthly Income", x="Travels")+
+  ggtitle("Attritions trend Income VS Travel")
+
+# plot15
+exploratory_plot15 <-ggplot(data=employee)+
+  geom_point(aes(y=employee$MonthlyIncome, x=employee$TotalWorkingYears,color=JobRole))+
+  labs(y="Monthly Income", x="Working Years")+
+  ggtitle("Observing trend of Income VS Working Years")
+
+# plot16
+exploratory_plot16 <- ggplot(data=employee)+
+  geom_point(aes(y=employee$PercentSalaryHike, x=employee$PerformanceRating, color=Attrition))+
+  labs(y="Percentage Hike", x="Performance Rating")+
+  ggtitle("Attritions trend Percentage Hike VS Performance Rating")
