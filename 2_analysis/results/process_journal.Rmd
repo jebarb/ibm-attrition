@@ -20,20 +20,20 @@ library(randomForest)
 library(e1071)
 ```
 
-#Abstract
+##Abstract
 
 The purpose of this project is to analyze data provided from IBM’s Human resource department in order to understand the common characteristics in employee attrition, or possible employee discrimination. In order to weight the importance of each variable presented, we filtered the data based on variables that were integer type and performed a correlation analysis. By doing so we were able to develop a basic understanding of which variables to include in our predictive model. The predictive model that we have developed has proven to predict employee attrition with an 84% accuracy rate. We also wanted to consider relationships in non-integer type variables in hopes of observing possible discrimination trends that can be supported by the dataset. We developed a number of visuals in order to justify our conclusions. Lastly, we strived to develop a user-friendly Shiny app for possible managers to use in order to predict employee attrition. All code and details shall be presented in the appropriate Rmd files as part of the final project. The final app can be viewed by running the app in the 'dashboard folder' or can be viewed at http://390.jebarb.com.
 
-#Overview and Motivation: 
+##Overview and Motivation: 
 
 The issue of keeping one's employees happy and satisfied is a perennial and age-old challenge. If an employee you have invested so much time and money leaves for "greener pastures", then this would mean that you would have to spend even more time and money to hire somebody else. Alongside these reason maintaining happy employees have resulted in increase profit for companies based on various studies done in industry. By understanding the main reasons why employees leave and possible discrimination, the increase probability your company will succeed. 
 
 
-#Related Work
+##Related Work
 
 In class we had discussed effective techniques of communication. As a team we took that to heart and wanted to develop models that were not only easy to understand but visually pleasing. We have looked into various psychology journals, which study employee habits and utility in order to develop a healthy reasoning of what possible variables are important based on published studies.
 
-#Initial Questions
+##Initial Questions
 *	Does Marital Status have a significant effect on wages?
 *	How does performance rating contribute to monthly income? 
 *	How do different departments contribute to employee attrition?
@@ -408,7 +408,7 @@ Grid Search: define a grid of algorithm parameters to try.
 
 We performed grid search by setting mtry =c(1:23). The result based on training accuracy gives us the optimal model when mtry =3. So we use this tuned parameter to build our final model. 
 
-```{r eval = TRUE}
+```{r eval = FALSE}
 #grid search to choose the best mtry
 control <- trainControl(method="repeatedcv", number=10, repeats=3, search="grid")
 set.seed(1234)
@@ -527,7 +527,7 @@ abline(h=0,col='red',lwd=2)
 
 As we can see, the new model using only 21 features has AUC equals to 0.77. Comparing to our final model which has AUC equals to 0.83, this model decreases performance a lot. In this case, we'll suggest HR to consider all features if they use our model to do attrition prediction. Decreasing the number of feature and improving the performance of model are always a trad-off problem. But there are also many ways to improve, such as changing the number of selected features or using other features to build model, in order to reach a balance. 
 
-##Conclusion: 
+##Conclusion 
 
 We were able to accomplish our two main objectives. Develop an accurate model for predicting employee attrition and identify possible areas of discrimination based on various characteristics. By utilizing various types of graph we were able to emphasize the trends by possible gender discrimination, and employee attrition. Though as we answered our objective questions, we began developing questions that could not be answered by the dataset such as how happy are IBM employees, was this data comparable to other technology companies, and also what incentive systems are in place to ensure accurate responses from employees and incentive to perform well.
 
