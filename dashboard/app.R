@@ -76,30 +76,30 @@ ui <- dashboardPage(
       ),
       # Interactive tab content
       tabItem(tabName = "interactive",
-              numericInput("tmp", "num", 0),
-              numericInput("OverTimeYes", "OverTimeYes", 0),            
-              numericInput("StockOptionLevel", "StockOptionLevel", 0),      
-              numericInput("TotalWorkingYears", "TotalWorkingYears", 0),      
+              selectInput("OverTimeYes", "Overtime", c("Yes" = 0, "No" = 1)), # boolean
+              selectInput("StockOptionLevel", "StockOptionLevel", c("0" = 0, "1" = 1, "2" = 2, "3" = 3)), # 0-3
+              selectInput("EnvironmentSatisfaction", "EnvironmentSatisfaction", c("1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5)), # 1-4
+              selectInput("JobSatisfaction", "JobSatisfaction", c("1" = 1, "2" = 2, "3" = 3, "4" = 4)), # 1-4
+              selectInput("JobLevel", "JobLevel", c("1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5)), # 1-5              
+              selectInput("Education", "Education", c("1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5)), # 1-5              
+              selectInput("WorkLifeBalance", "WorkLifeBalance", c("1" = 1, "2" = 2, "3" = 3, "4" = 4)), # 1-4         
+              selectInput("MaritalStatus", "Marital Status ", c("Single" = "Single", "Married" = "Married", "Divorced" = "Divorced")), # boolean  
+              selectInput("JobInvolvement", "JobInvolvement", c("1" = 1, "2" = 2, "3" = 3, "4" = 4)), # 1-4          
               numericInput("MonthlyIncome", "MonthlyIncome", 0),
-              numericInput("JobInvolvement", "JobInvolvement", 0),          
+              numericInput("TotalWorkingYears", "TotalWorkingYears", c("1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5)), # 1-4  
               numericInput("Age", "Age", 0),                    
-              numericInput("EnvironmentSatisfaction", "EnvironmentSatisfaction", 0), 
-              numericInput("JobSatisfaction", "JobSatisfaction", 0),         
               numericInput("YearsWithCurrManager", "YearsWithCurrManager", 0),   
               numericInput("YearsAtCompany", "YearsAtCompany", 0),          
-              numericInput("JobLevel", "JobLevel", 0),                
               numericInput("YearsInCurrentRole", "YearsInCurrentRole", 0),     
               numericInput("DailyRate", "DailyRate", 0),               
               numericInput("EmployeeNumber", "EmployeeNumber", 0),          
-              numericInput("TrainingTimesLastYear", "TrainingTimesLastYear", 0),  
+              numericInput("TrainingTimesLastYear", "TrainingTimesLastYear", 0),   
               numericInput("DistanceFromHome", "DistanceFromHome", 0),        
-              numericInput("Education", "Education", 0),               
               numericInput("NumCompaniesWorked", "NumCompaniesWorked", 0),     
-              numericInput("HourlyRate", "HourlyRate", 0),              
-              numericInput("WorkLifeBalance", "WorkLifeBalance", 0),         
-              numericInput("MaritalStatusMarried", "MaritalStatusMarried", 0),   
-              numericInput("MaritalStatusSingle", "MaritalStatusSingle", 0),  
-              verbatimTextOutput("view")
+              numericInput("HourlyRate", "Hourly Rate", 0),
+              h2("Probability of Attrition"),
+              verbatimTextOutput("view"),
+              tableOutput("df")
       )
     )
   )
@@ -108,35 +108,103 @@ ui <- dashboardPage(
 server <- function(input, output) {
   # All code in external files for the sake of cleanliness
   
+  MartialStatusSingle <- reactive({
+    switch(input$MartialStatus,
+           'Single' = 1,
+           'Married' = 0,
+           'Divorced' = 0)
+  })
+  
+  MartialStatusMarried <- reactive({
+    switch(input$MartialStatus,
+           'Single' = 0,
+           'Married' = 1,
+           'Divorced' = 0)
+  })
+  
   construct_df <- function() {
     data.frame(
-      "OverTimeYes" = input$OverTimeYes,
-      "StockOptionLevel" = input$StockOptionLevel,
+      "OverTimeYes" = switch(input$OverTimeYes,
+                             "0" = 0,
+                             "1" = 1),
+      "StockOptionLevel" = switch(input$StockOptionLevel,
+                                  "0" = 0,
+                                  "1" = 1,
+                                  "2" = 2,
+                                  "3" = 3,
+                                  "4" = 4,
+                                  "5" = 5),
       "TotalWorkingYears" = input$TotalWorkingYears,
       "MonthlyIncome" = input$MonthlyIncome,
-      "JobInvolvement" = input$JobInvolvement,
+      "JobInvolvement" = switch(input$JobInvolvement,
+                                "0" = 0,
+                                "1" = 1,
+                                "2" = 2,
+                                "3" = 3,
+                                "4" = 4,
+                                "5" = 5),
       "Age" = input$Age,
-      "EnvironmentSatisfaction" = input$EnvironmentSatisfaction,
-      "JobSatisfaction" = input$JobSatisfaction,
+      "EnvironmentSatisfaction" = switch(input$EnvironmentSatisfaction,
+                                         "0" = 0,
+                                         "1" = 1,
+                                         "2" = 2,
+                                         "3" = 3,
+                                         "4" = 4,
+                                         "5" = 5),
+      "JobSatisfaction" = switch(input$JobSatisfaction,
+                                 "0" = 0,
+                                 "1" = 1,
+                                 "2" = 2,
+                                 "3" = 3,
+                                 "4" = 4,
+                                 "5" = 5),
       "YearsWithCurrManager" = input$YearsWithCurrManager,
       "YearsAtCompany" = input$YearsAtCompany,
-      "JobLevel" = input$JobLevel,
+      "JobLevel" = switch(input$JobLevel,
+                          "0" = 0,
+                          "1" = 1,
+                          "2" = 2,
+                          "3" = 3,
+                          "4" = 4,
+                          "5" = 5),
       "YearsInCurrentRole" = input$YearsInCurrentRole,
       "DailyRate" = input$DailyRate,
       "EmployeeNumber" = input$EmployeeNumber,
       "TrainingTimesLastYear" = input$TrainingTimesLastYear,
       "DistanceFromHome" = input$DistanceFromHome,
-      "Education" = input$Education,
+      "Education" = switch(input$Education,
+                           "0" = 0,
+                           "1" = 1,
+                           "2" = 2,
+                           "3" = 3,
+                           "4" = 4,
+                           "5" = 5),
       "NumCompaniesWorked" = input$NumCompaniesWorked,
       "HourlyRate" = input$HourlyRate,
-      "WorkLifeBalance" = input$WorkLifeBalance,
-      "MaritalStatusMarried" = input$MaritalStatusMarried,
-      "MaritalStatusSingle" = input$MaritalStatusSingle
+      "WorkLifeBalance" = switch(input$WorkLifeBalance,
+                                 "0" = 0,
+                                 "1" = 1,
+                                 "2" = 2,
+                                 "3" = 3,
+                                 "4" = 4,
+                                 "5" = 5),
+      "MaritalStatusMarried" = switch(input$MaritalStatus,
+                                      'Single' = 0,
+                                      'Married' = 1,
+                                      'Divorced' = 0),
+      "MaritalStatusSingle" = switch(input$MaritalStatus,
+                                     'Single' = 1,
+                                     'Married' = 0,
+                                     'Divorced' = 0)
     )
   }
   
   rf_optimal <- readRDS("rf_optimal.rda")
+  
+  # create reactive object to store input data
   values <- reactiveValues(df_data = NULL)
+  
+  # watch each field and update data frame when changed
   observeEvent(input$OverTimeYes, {
     values$df_data <- construct_df()
   })
@@ -197,13 +265,13 @@ server <- function(input, output) {
   observeEvent(input$WorkLifeBalance, {
     values$df_data <- construct_df()
   })
-  observeEvent(input$MaritalStatusMarried, {
+  observeEvent(input$MaritalStatus, {
     values$df_data <- construct_df()
   })
-  observeEvent(input$MaritalStatusSingle, {
-    values$df_data <- construct_df()
-  })
+  
+  # predict probability of attrition
   output$view <- reactive(predict(rf_optimal, values$df_data, type = "prob")[1,2])
+  output$df <- renderTable(values$df_data)
 }
 
 shinyApp(ui, server)

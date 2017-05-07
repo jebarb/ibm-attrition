@@ -237,6 +237,10 @@ saveRDS(rf_optimal, file = "rf_optimal.rda")
 ```
 
 ```{r}
+colnames(test)
+head(test$MaritalStatusMarried)
+head(test$OverTimeYes)
+```
 #analyzing performance
 predictors <- names(trainBalance)[names(trainBalance) != 'Attrition']
 length(predictors)
