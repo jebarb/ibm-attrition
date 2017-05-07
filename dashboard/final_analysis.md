@@ -10,7 +10,7 @@ result, we are going to build a predictive model on emplyee's attrition.
 To start off, we will first construct some feature engineering.
 
     #can't do read_csv here, need be "dataframe" 
-    data <- read.csv('WA_Fn-UseC_-HR-Employee-Attrition.csv')
+    data <- read.csv('IBM-HR-Employee-Attrition.csv')
 
 Feature engineering & Categorical Encoding
 ------------------------------------------
@@ -271,9 +271,6 @@ this tuned parameter to build our final model.
 
 ![](final_analysis_files/figure-markdown_strict/unnamed-chunk-9-1.png)
 
-From the graph, we can see mtry = 3 has the optimum model using the
-largest value.
-
     control <- trainControl(method="repeatedcv", number=10, repeats=3)
     set.seed(1234)
     tunegrid <- expand.grid(.mtry= 3)
@@ -315,12 +312,11 @@ largest value.
 ![](final_analysis_files/figure-markdown_strict/unnamed-chunk-10-1.png)
 
 After tuning parameter we updated our model from using mtry =2 to mtry
-=3. As observed, our moel gives us a better AUC from the previous 0.8435
-to 0.8437. There is no huge difference between these two models. Our
-Guess is when we limited the number of mtry (number of the features
-randomly selected), we also limited the depth of the tree, so the result
-has smaller variance, since normally the deeper the forest, the smaller
-bias but bigger variance.
+=3. As observed, our moel gives us a little better AUC. There is no huge
+difference between these two models. Our Guess is when we limited the
+number of mtry (number of the features randomly selected), we also
+limited the depth of the tree, so the result has smaller variance, since
+normally the deeper the forest, the smaller bias but bigger variance.
 
 Accuracy of the model:
 
@@ -365,18 +361,20 @@ has been given most importance through the Random Forest algorithm.
     ## NumCompaniesWorked        25.32
     ## WorkLifeBalance           25.09
 
+    #plot(importance_grid)
     ggplot(importance_grid)+ggtitle("Random Forest Feature Importance")
 
 ![](final_analysis_files/figure-markdown_strict/unnamed-chunk-11-1.png)
-Most RF important features: OverTime, JobSatisfaction, JobInvolment.
-It's reasonable that overTime affects people's satisfaction derived from
-any job. It seems our classifier has cought on to this. We're suprised
-that marital status are not in the first 20 importance. It may because
-marital status has high correlation with other features(such as Age). We
-can also reflect back to the correlations between features we made in
-Data Exploratory Analysis section.
 
-Conclusion
+Most RF important features: OverTime It's reasonable that overTime
+affects people's satisfaction derived from any job. It seems our
+classifier has cought on to this. We're suprised that marital status are
+not in the first 20 importance. It may because marital status has high
+correlation with other features(such as Age). We can also reflect back
+to the correlations between features we made in Data Exploratory
+Analysis section.
+
+CONCLUSION
 ----------
 
 Fom some basic Exploratory Data Analysis to feature engineering to
@@ -390,10 +388,108 @@ besides SMOTE. Because we created over 400 artifical points to balance
 the data, it might effect the accuracy of our model. Also, more features
 could be engineered from the data to make better performance.
 
-    ###building model based on selected data
+Appendix -- Further discover
+----------------------------
 
-    slData <- data[, c("OverTime", "StockOptionLevel","TotalWorkingYears",
+We're wondering if building a random forest classifier only using the
+first 21 variables based on their importance that we discovred above,
+what's its performance comparing to that of our final model that
+included all variables. The motivation is to reduce HR's burden when
+evaluating an employee's attrition possibility. If this new model has
+similar performance than our final model(reducing the features will
+highly possibly reduce the performance, but a minor decrease is
+tolerable), we can use it instead. So an HR donesn't have to collect all
+31 variables from employee but only those necessary 21.
+
+To do this, we just need to use the data only containing those important
+21 features. And perform the same process on this new data set to build
+the model.
+
+    # Select the subset of data only containing important 21 features 
+    dataSlct <- data[, c("Attrition", "OverTime", "StockOptionLevel","TotalWorkingYears",
     "MonthlyIncome","JobInvolvement","Age","EnvironmentSatisfaction", "JobSatisfaction",
     "YearsWithCurrManager","YearsAtCompany","JobLevel","YearsInCurrentRole",
     "DailyRate","EmployeeNumber","TrainingTimesLastYear","DistanceFromHome","Education",
-    "NumCompaniesWorked","HourlyRate","WorkLifeBalance")]
+    "NumCompaniesWorked","HourlyRate","WorkLifeBalance","MaritalStatus")]
+
+    #create dummy variable
+    dummySlct <- model.matrix(Attrition ~ ., dataSlct)
+    new <- data.frame(dummySlct) # change back to a datafram 
+    new <- new[,-1] # get rid first useless columne
+    Attrition <- dataSlct$Attrition
+    dataDummy <- cbind(Attrition,new) #add Attrition back 
+
+    #partition 
+    set.seed(1234)
+    splitIndex <- createDataPartition(dataDummy$Attrition, p =0.8, list =FALSE, times =1)
+    test <- dataDummy[-splitIndex,]
+    train <- dataDummy[splitIndex,]
+
+    #oversampling 
+    trainBalance <- SMOTE(Attrition ~ ., train, perc.over = 400, perc.under=131)
+    table(trainBalance$Attrition)
+
+    ## 
+    ##  No Yes 
+    ## 995 950
+
+    prop.table(table(trainBalance$Attrition))
+
+    ## 
+    ##        No       Yes 
+    ## 0.5115681 0.4884319
+
+    #building modeling 
+    control <- trainControl(method="repeatedcv", number=10, repeats=3)
+    set.seed(1234)
+    tunegrid <- expand.grid(.mtry= 3)
+    rf_optimal <- train(Attrition~., data=trainBalance, method="rf", metric="Accuracy", tuneGrid=tunegrid, trControl=control)
+    rf_optimal
+
+    ## Random Forest 
+    ## 
+    ## 1945 samples
+    ##   22 predictor
+    ##    2 classes: 'No', 'Yes' 
+    ## 
+    ## No pre-processing
+    ## Resampling: Cross-Validated (10 fold, repeated 3 times) 
+    ## Summary of sample sizes: 1751, 1750, 1751, 1751, 1750, 1750, ... 
+    ## Resampling results:
+    ## 
+    ##   Accuracy   Kappa    
+    ##   0.9569804  0.9138704
+    ## 
+    ## Tuning parameter 'mtry' was held constant at a value of 3
+
+    #analyzing performance
+    predictors <- names(trainBalance)[names(trainBalance) != 'Attrition']
+    length(predictors)
+
+    ## [1] 22
+
+    pred_rf_gridsearch <- predict(rf_optimal$finalModel,test[,predictors],type = "prob")
+    auc <- roc(test$Attrition, pred_rf_gridsearch[,1])
+    print(auc)
+
+    ## 
+    ## Call:
+    ## roc.default(response = test$Attrition, predictor = pred_rf_gridsearch[,     1])
+    ## 
+    ## Data: pred_rf_gridsearch[, 1] in 246 controls (test$Attrition No) > 47 cases (test$Attrition Yes).
+    ## Area under the curve: 0.7689
+
+    plot(auc, ylim=c(0,1),  print.thres=TRUE, main=paste('AUC:',round(auc$auc[[1]],2)))
+    abline(h=1,col='blue',lwd=2)
+    abline(h=0,col='red',lwd=2)
+
+![](final_analysis_files/figure-markdown_strict/unnamed-chunk-17-1.png)
+
+As we can see, the new model using only 21 features has AUC equals to
+0.77. Comparing to our final model which has AUC equals to 0.83, this
+model decreases performance a lot. In this case, we'll suggest HR to
+consider all features if they use our model to do attrition prediction.
+Decreasing the number of feature and improving the performance of model
+are always a trad-off problem. But there are also many ways to improve,
+such as changing the number of selected features or using other features
+to build model, in order to reach a balance.
