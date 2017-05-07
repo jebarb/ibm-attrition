@@ -21,7 +21,7 @@ After our exploratory anlaysis, we got a sense of how correlated one feature is 
 
 ```{r}
 #can't do read_csv here, need be "dataframe" 
-data <- read.csv('WA_Fn-UseC_-HR-Employee-Attrition.csv')
+data <- read.csv('IBM-HR-Employee-Attrition.csv')
 ```
 
 ## Feature engineering & Categorical Encoding

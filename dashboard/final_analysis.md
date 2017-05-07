@@ -1,7 +1,7 @@
 Final Analysis
 ==============
 
-INTRODUCTION
+Introduction
 ------------
 
 After our exploratory anlaysis, we got a sense of how correlated one
@@ -189,6 +189,7 @@ make predictions by using this model.
     abline(h=0,col='red',lwd=2)
 
 ![](final_analysis_files/figure-markdown_strict/unnamed-chunk-8-1.png)
+
 Accuracy of the model: We use AUC(area under the curve) to measure the
 prediction results. As observed, our Random Forest returns an AUC of
 0.8435 for its predictions.
@@ -226,7 +227,52 @@ this tuned parameter to build our final model.
     #tunegrid <- expand.grid(.mtry=8)
     rf_gridsearch <- train(Attrition~., data=trainBalance, method="rf", metric="Accuracy", tuneGrid=tunegrid, trControl=control)
     print(rf_gridsearch)
+
+    ## Random Forest 
+    ## 
+    ## 1945 samples
+    ##   45 predictor
+    ##    2 classes: 'No', 'Yes' 
+    ## 
+    ## No pre-processing
+    ## Resampling: Cross-Validated (10 fold, repeated 3 times) 
+    ## Summary of sample sizes: 1751, 1750, 1751, 1751, 1750, 1750, ... 
+    ## Resampling results across tuning parameters:
+    ## 
+    ##   mtry  Accuracy   Kappa    
+    ##    1    0.9286994  0.8570482
+    ##    2    0.9573258  0.9145149
+    ##    3    0.9581813  0.9162335
+    ##    4    0.9569759  0.9138278
+    ##    5    0.9554366  0.9107388
+    ##    6    0.9550938  0.9100615
+    ##    7    0.9544074  0.9087021
+    ##    8    0.9521746  0.9042213
+    ##    9    0.9521764  0.9042357
+    ##   10    0.9511464  0.9021712
+    ##   11    0.9501216  0.9001057
+    ##   12    0.9518345  0.9035491
+    ##   13    0.9509781  0.9018296
+    ##   14    0.9492625  0.8983971
+    ##   15    0.9499454  0.8997621
+    ##   16    0.9482307  0.8963259
+    ##   17    0.9478897  0.8956455
+    ##   18    0.9482316  0.8963267
+    ##   19    0.9482307  0.8963255
+    ##   20    0.9465160  0.8928922
+    ##   21    0.9473689  0.8945966
+    ##   22    0.9480580  0.8959741
+    ##   23    0.9466869  0.8932333
+    ## 
+    ## Accuracy was used to select the optimal model using  the largest value.
+    ## The final value used for the model was mtry = 3.
+
     plot(rf_gridsearch)
+
+![](final_analysis_files/figure-markdown_strict/unnamed-chunk-9-1.png)
+
+From the graph, we can see mtry = 3 has the optimum model using the
+largest value.
 
     control <- trainControl(method="repeatedcv", number=10, repeats=3)
     set.seed(1234)
@@ -319,7 +365,6 @@ has been given most importance through the Random Forest algorithm.
     ## NumCompaniesWorked        25.32
     ## WorkLifeBalance           25.09
 
-    #plot(importance_grid)
     ggplot(importance_grid)+ggtitle("Random Forest Feature Importance")
 
 ![](final_analysis_files/figure-markdown_strict/unnamed-chunk-11-1.png)
@@ -331,7 +376,7 @@ marital status has high correlation with other features(such as Age). We
 can also reflect back to the correlations between features we made in
 Data Exploratory Analysis section.
 
-CONCLUSION
+Conclusion
 ----------
 
 Fom some basic Exploratory Data Analysis to feature engineering to

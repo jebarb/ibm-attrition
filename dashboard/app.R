@@ -10,11 +10,11 @@ ui <- dashboardPage(
   dashboardSidebar(
     sidebarMenu(
       menuItem("Proposal", tabName = "proposal", icon = icon("list")),
-      menuItem("Exploratory Analysis", tabName = "exploratory_analysis", icon = icon("compass")),
-      menuItem("Exploratory Analysis Results", tabName = "exploratory_analysis_summary", icon = icon("list")),
-      menuItem("Final Analysis", tabName = "final_analysis", icon = icon("compass")),
-      menuItem("Interactive Model", tabName = "interactive", icon = icon("bar-chart")),
-      menuItem("Final Results", tabName = "final_results", icon = icon("compass"))
+      menuItem("Exploratory Analysis", tabName = "exploratory_analysis", icon = icon("line-chart")),
+      menuItem("Exploratory Analysis Results", tabName = "exploratory_analysis_summary", icon = icon("compass")),
+      menuItem("Final Analysis", tabName = "final_analysis", icon = icon("calculator")),
+      menuItem("Interactive Model", tabName = "interactive", icon = icon("edit")),
+      menuItem("Final Results", tabName = "final_results", icon = icon("list"))
     )
   ),
   

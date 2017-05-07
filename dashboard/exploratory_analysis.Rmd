@@ -1,5 +1,5 @@
 ---
-title: "final analysis"
+title: "exploratory analysis"
 author: "Ria Pan"
 date: "May 6, 2017"
 output: md_document
@@ -13,9 +13,11 @@ library(PerformanceAnalytics)
 library(Hmisc)
 library(corrplot)
 ```
+
+# Exploratory Analysis
   
 ```{r}
-employee <- read_csv("WA_Fn-UseC_-HR-Employee-Attrition.csv")
+employee <- read_csv("IBM-HR-Employee-Attrition.csv")
 quit <- filter(employee, Attrition=="Yes")
 stayed <- filter(employee, Attrition=="No")
 ```
@@ -25,7 +27,7 @@ Graph of average monthly income across all roles faceted by gender
 ```{r}
 gender_influence <- employee %>% group_by(Gender, JobRole) %>% summarise(average_monthly_income=mean(MonthlyIncome))
 gender_influence_monthlyincome <- gender_influence %>% mutate(round_income=round(average_monthly_income))
-exploratory_plot1 <- ggplot(gender_influence_monthlyincome, aes(x=Gender,y=average_monthly_income, color=Gender))+
+ggplot(gender_influence_monthlyincome, aes(x=Gender,y=average_monthly_income, color=Gender))+
   geom_bar(stat = "identity",width=0.5,position=position_dodge())+
   geom_text(aes(label=round_income), vjust=1.6, color="white",
             position = position_dodge(0.9), size=3.5)+
@@ -44,7 +46,7 @@ roles_quit <- str_count(Job_roles)
 loss_by_job <- data_frame(Job=Job_roles, "Percentage loss"=(roles_quit/1470)*100)
 loss_by_job <- loss_by_job %>% mutate(round_loss=round(loss_by_job$`Percentage loss`,digits=2))
 loss_by_job <- arrange(loss_by_job, desc(round_loss))
-exploratory_plot2 <- ggplot(loss_by_job, aes(x=reorder(loss_by_job$Job,-loss_by_job$round_loss),y=loss_by_job$round_loss))+
+ggplot(loss_by_job, aes(x=reorder(loss_by_job$Job,-loss_by_job$round_loss),y=loss_by_job$round_loss))+
   geom_bar(stat = "identity",width=0.5, position=position_dodge())+
   geom_text(aes(label=loss_by_job$round_loss), vjust=1.6, color="white",
             position = position_dodge(0.9), size=3.5)+
@@ -57,7 +59,7 @@ Average monthly income based on Marital status
 
 ```{r}
 testing <- employee %>% group_by(MaritalStatus) %>% summarise(mean=round(mean(MonthlyIncome),digits=0))
-exploratory_plot3 <- ggplot(testing, aes(x=testing$MaritalStatus,y=testing$mean))+
+ggplot(testing, aes(x=testing$MaritalStatus,y=testing$mean))+
   geom_bar(stat = "identity",width=0.5, position=position_dodge())+
   geom_text(aes(label=testing$mean), vjust=1.6, color="white",
             position = position_dodge(0.9), size=3.5)+
@@ -69,7 +71,7 @@ Average monthly income across different levels of Relationship satisfaction
 
 ```{r}
 RelSat <-employee %>% group_by(RelationshipSatisfaction) %>% summarise(mean=mean(MonthlyIncome))
-exploratory_plot4 <- ggplot(RelSat, aes(x=reorder(RelSat$RelationshipSatisfaction,-RelSat$mean),y=RelSat$mean))+
+ggplot(RelSat, aes(x=reorder(RelSat$RelationshipSatisfaction,-RelSat$mean),y=RelSat$mean))+
   geom_bar(stat = "identity",width=0.5, position=position_dodge())+
   geom_text(aes(label=round(RelSat$mean)), vjust=1.6, color="white",
             position = position_dodge(0.9), size=3.5)+
@@ -82,7 +84,7 @@ Average monthly income across different levels of Job Satisfaction
 ```{r}
 JobSat <- employee %>% group_by( JobSatisfaction) %>% summarise(mean=mean(MonthlyIncome))
 Jobsatty <- c("Low", "Medium", "High", "Very High")
-exploratory_plot5 <- ggplot(JobSat, aes(x=reorder(Jobsatty,-JobSat$mean),y=JobSat$mean))+
+ggplot(JobSat, aes(x=reorder(Jobsatty,-JobSat$mean),y=JobSat$mean))+
   geom_bar(stat = "identity",width=0.5, position=position_dodge())+
   geom_text(aes(label=round(JobSat$mean)), vjust=1.6, color="white",
             position = position_dodge(0.9), size=3.5)+
@@ -94,13 +96,13 @@ There is no significant linear relationship between Work life balance and years 
 
 ```{r}
 lin_reg <- lm(WorkLifeBalance~ YearsSinceLastPromotion, employee)
-exploratory_plot6 <- summary(lin_reg)
+summary(lin_reg)
 ```
 
 There is no relationship between performance rating and monthly income
 
 ```{r}
-exploratory_plot7 <- renderPlot(boxplot(MonthlyIncome~WorkLifeBalance,data = employee,xlab="PerformanceRating", ylab="MonthlyIncome"))
+boxplot(MonthlyIncome~WorkLifeBalance,data = employee,xlab="PerformanceRating", ylab="MonthlyIncome")
 ```
 
 The figure below is also the visualization of correlations between 5 features. 
@@ -124,11 +126,11 @@ flattenCorrMatrix <- function(cormat, pmat) {
   )
 }
 
-exploratory_plot8 <- flattenCorrMatrix(res2$r, res2$P)
+flattenCorrMatrix(res2$r, res2$P)
 ```
 
 ```{r}
-exploratory_plot9 <- renderPlot(chart.Correlation(numeric, histogram=TRUE, pch=19))
+suppressWarnings(chart.Correlation(numeric, histogram=TRUE, pch=19))
 ```
 
 The figure below shows female has higher avarage salary than males in IBM
@@ -136,13 +138,13 @@ The figure below shows female has higher avarage salary than males in IBM
 ```{r}
 genderIncome <- employee %>% group_by(Gender) %>%
   summarise(meanSalary = mean(MonthlyIncome))
-exploratory_plot10 <- ggplot(genderIncome, aes (x = Gender, y = meanSalary)) + geom_bar(stat ="identity") + ggtitle("Mean monthly income between gender ")
+ggplot(genderIncome, aes (x = Gender, y = meanSalary)) + geom_bar(stat ="identity") + ggtitle("Mean monthly income between gender ")
 ```
 
 The below plot shows gender distribution of gender across jobs
 
 ```{r}
-exploratory_plot11 <- ggplot(employee, aes(x = Gender, color = Gender)) +
+ggplot(employee, aes(x = Gender, color = Gender)) +
   geom_bar()+ facet_wrap(~ JobRole)+ggtitle("Job distribution among gender")+ ggtitle("Job distribution across gender ")
 ```
 
@@ -151,7 +153,7 @@ The figure below illastrates the job distribution between male and female
 ```{r}
 genderJobIncome <- employee  %>% group_by(Gender, JobRole) %>%
   summarise(meanSalarybyJob = mean(MonthlyIncome))
-exploratory_plot12 <- ggplot(genderJobIncome, aes(x = JobRole,y = meanSalarybyJob, color = Gender)) +
+ggplot(genderJobIncome, aes(x = JobRole,y = meanSalarybyJob, color = Gender)) +
   geom_point() +ggtitle("Mean monthly income among diffrent jobs across gender ")
 ```
 
@@ -161,26 +163,26 @@ employee$Attrition[employee$Attrition=="No"] <- 0
 integer_data <-employee[,c(1,2,4,6,7,10,11,13,14,15,17,19,20,21,24,25,26,28:35)]
 integer_data$Attrition <-as.numeric(integer_data$Attrition)
 correlation_data <- cor(integer_data)
-exploratory_plot13 <- renderPlot(corrplot(correlation_data,method="circle"))
+corrplot(correlation_data,method="circle")
 ```
 
 ```{r}
 quit <- filter(employee, Attrition==1)
-exploratory_plot14 <-ggplot(data=quit)+
+ggplot(data=quit)+
   geom_point(aes(y=quit$MonthlyIncome, x=quit$BusinessTravel,color=JobRole))+
   labs(y="Monthly Income", x="Travels")+
   ggtitle("Attritions trend Income VS Travel")
 ```
 
 ```{r}
-exploratory_plot15 <-ggplot(data=employee)+
+ggplot(data=employee)+
   geom_point(aes(y=employee$MonthlyIncome, x=employee$TotalWorkingYears,color=JobRole))+
   labs(y="Monthly Income", x="Working Years")+
   ggtitle("Observing trend of Income VS Working Years")
 ```
 
 ```{r}
-exploratory_plot16 <- ggplot(data=employee)+
+ggplot(data=employee)+
   geom_point(aes(y=employee$PercentSalaryHike, x=employee$PerformanceRating, color=Attrition))+
   labs(y="Percentage Hike", x="Performance Rating")+
   ggtitle("Attritions trend Percentage Hike VS Performance Rating")
