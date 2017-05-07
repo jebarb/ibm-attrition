@@ -72,7 +72,6 @@ ui <- dashboardPage(
       # Interactive tab content
       tabItem(tabName = "interactive",
               
-              
               h2("Probability of Attrition"),
               verbatimTextOutput("view"),
               
@@ -94,7 +93,7 @@ ui <- dashboardPage(
               br(),
               
               bootstrapPage(
-                div(style="display:inline-block", selectInput("WorkLifeBalance", "Work/life balance", c("Bad" = 1, "Good" = 2, "Better" = 3, "Best" = 4), width = 200)), # 1-4    
+                div(style="display:inline-block", selectInput("WorkLifeBalance", "Work/life balance", c("Bad" = 4, "Good" = 3, "Better" = 2, "Best" = 1), width = 200)), # 1-4    
                 div(style="display:inline-block", selectInput("MaritalStatus", "Marital status ", c("Single" = "Single", "Married" = "Married", "Divorced" = "Divorced"), width = 200)), # boolean  
                 div(style="display:inline-block", selectInput("JobInvolvement", "Job involvement", c("Low" = 1, "Medium" = 2, "High" = 3, "Very High" = 4), width = 200)) # 1-4          
               ),
@@ -136,7 +135,7 @@ ui <- dashboardPage(
 )
 
 server <- function(input, output) {
-
+  
   # watch 
   MartialStatusSingle <- reactive({
     switch(input$MartialStatus,
