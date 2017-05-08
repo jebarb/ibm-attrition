@@ -15,8 +15,6 @@ library(randomForest)
 library(e1071)
 ```
 
-#Final Analysis
-
 ## Introduction
 After our exploratory anlaysis, we got a sense of how correlated one feature is to the other and created some visualisations. Based on that result, we are going to build a predictive model on emplyee's attrition. To start off, we will first construct some feature engineering. 
 
